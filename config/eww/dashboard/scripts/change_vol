@@ -1,0 +1,15 @@
+#!/bin/bash
+# Usage: scripts/change_vol <up|down|set> [value]
+CFG="$HOME/.config/eww/dashboard"
+EWW="$HOME/.local/bin/eww"
+
+if [[ "$1" == "up" ]]; then
+    pamixer -i "$2"
+elif [[ "$1" == "down" ]]; then
+    pamixer -d "$2"
+elif [[ "$1" == "set" ]]; then
+    pamixer --set-volume "$2"
+fi
+
+# Instantaneously update the VOLUME variable in Eww
+${EWW} --config "$CFG" update VOLUME=$(pamixer --get-volume) &

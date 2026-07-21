@@ -1,0 +1,8 @@
+config/eww/dashboard/scripts/spotify/image.jpg
+config/eww/dashboard/scripts/spotify/spotify_song_name.txt
+__pycache__/
+*.pyc
+config/waybar/backups/
+*_backup_*
+.cache/
+*REFERNCE*

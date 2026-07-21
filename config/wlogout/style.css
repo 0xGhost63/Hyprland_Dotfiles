@@ -1,0 +1,70 @@
+* {
+    background-image: none;
+    font-size: 20px;
+    font-family: "JetBrains Mono NFM";
+}
+
+@import '../../.config/waybar/colors.css';
+
+window {
+    background-color: rgba(17, 17, 17, 0.45)
+}
+
+button {
+    border-radius: 20px;
+    margin: 10px;
+    color: @on_surface;
+    border: 1px solid @outline_variant;
+    background-color: rgba(15, 20, 22, 0.75);
+    outline: none;
+    background-repeat: no-repeat;
+    background-position: center 25%;
+    background-size: 28%;
+    box-shadow: none;
+    text-shadow: none;
+    padding-top: 65px;
+}
+
+button:hover {
+    background-color: @on_secondary_fixed_variant;
+    border-color: @primary;
+    background-size: 32%;
+    transition: all 0.2s ease-in-out;
+}
+
+button:focus {
+    background-color: rgba(15, 20, 22, 0.75);
+    outline: none;
+    box-shadow: none;
+}
+
+/* Adjust the size of the icon or content inside the button */
+button span {
+    font-size: 1.2em; /* Increase the font size */
+}
+
+
+#lock {
+    background-image: url("/home/sannan/.config/wlogout/icons/lock.png");
+}
+
+#logout {
+    background-image: url("/home/sannan/.config/wlogout/icons/logout.png");
+}
+
+#suspend {
+    background-image: url("/home/sannan/.config/wlogout/icons/sleep.png");
+}
+
+#shutdown {
+    background-image: url("/home/sannan/.config/wlogout/icons/power.png");
+}
+
+#reboot {
+    background-image: url("/home/sannan/.config/wlogout/icons/restart.png");
+}
+
+#hibernate {
+    background-image: url("/home/sannan/.config/wlogout/icons/hibernate.png");
+}
+

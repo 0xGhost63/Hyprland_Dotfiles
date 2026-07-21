@@ -1,0 +1,15 @@
+#!/bin/bash
+# Usage: scripts/change_blight <up|down|set> [value]
+CFG="$HOME/.config/eww/dashboard"
+EWW="$HOME/.local/bin/eww"
+
+if [[ "$1" == "up" ]]; then
+    brightnessctl set "+$2%"
+elif [[ "$1" == "down" ]]; then
+    brightnessctl set "$2%-"
+elif [[ "$1" == "set" ]]; then
+    brightnessctl set "$2%"
+fi
+
+# Instantaneously update the BLIGHT variable in Eww
+${EWW} --config "$CFG" update BLIGHT=$(brightnessctl -m | cut -d ',' -f 4 | tr -d '%') &

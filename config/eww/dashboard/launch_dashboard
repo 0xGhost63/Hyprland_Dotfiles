@@ -1,0 +1,41 @@
+#!/bin/bash
+
+CFG="$HOME/.config/eww/dashboard"
+EWW="$(command -v eww 2>/dev/null || echo "$HOME/.local/bin/eww")"
+
+## Start THIS config's daemon if it's not already running
+if ! ${EWW} --config "$CFG" ping &>/dev/null; then
+	${EWW} --config "$CFG" daemon
+	sleep 1
+fi
+
+## Open widgets
+run_eww() {
+	${EWW} --config "$CFG" open-many \
+		background \
+		profile \
+		system \
+		clock \
+		uptime \
+		spotify \
+		github \
+		instagram \
+		claude \
+		youtube \
+		gmail \
+		weather \
+		apps \
+		logout \
+		sleep \
+		reboot \
+		poweroff \
+		folders
+}
+
+## Toggle — trim whitespace and check if any window names exist
+ACTIVE=$(${EWW} --config "$CFG" active-windows 2>/dev/null | tr -d '[:space:]')
+if [[ -n "$ACTIVE" ]]; then
+	${EWW} --config "$CFG" close-all
+else
+	run_eww
+fi
