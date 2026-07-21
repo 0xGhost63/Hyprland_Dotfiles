@@ -28,22 +28,13 @@ elif [[ "$1" == "--fm" ]]; then
 	close_dash && dolphin &
 
 elif [[ "$1" == "--ge" || "$1" == "--sp" ]]; then
-	close_dash && spotify &
+	close_dash && (command -v spotify-launcher &>/dev/null && spotify-launcher || spotify) &
 
 elif [[ "$1" == "--cd" || "$1" == "--wa" ]]; then
-	# wa is whatsapp, cd was dolphin originally. Let's support both.
-	if [[ "$1" == "--wa" ]]; then
-		close_dash && whatsapp-for-linux &
-	else
-		close_dash && dolphin &
-	fi
+	close_dash && (command -v elecwhat &>/dev/null && elecwhat || whatsapp-for-linux || whatsapp) &
 
 elif [[ "$1" == "--gp" || "$1" == "--oo" ]]; then
-	if [[ "$1" == "--oo" ]]; then
-		close_dash && /snap/bin/onlyoffice-desktopeditors &
-	else
-		close_dash && kitty nvim &
-	fi
+	close_dash && (command -v onlyoffice-desktopeditors &>/dev/null && onlyoffice-desktopeditors || desktopeditors || /snap/bin/onlyoffice-desktopeditors) &
 
 elif [[ "$1" == "--vb" || "$1" == "--vl" ]]; then
 	close_dash && vlc &

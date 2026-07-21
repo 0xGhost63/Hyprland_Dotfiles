@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Bluetooth Panel — Sleek GTK4 Control Dialog
+# Bluetooth Panel — Native DBus Control Dialog
 # Triggered from Waybar right-click on Bluetooth module
 
 import gi
@@ -10,8 +10,14 @@ import re
 gi.require_version("Gtk", "4.0")
 from gi.repository import Gtk, Gdk, GLib, Pango
 
+try:
+    import dbus
+    HAS_DBUS = True
+except ImportError:
+    HAS_DBUS = False
+
 GLib.set_prgname("btpanel")
-GLib.set_application_name("Bluetooth Panel")
+GLib.set_application_name("Bluetooth Control")
 
 CSS = b"""
 * {
@@ -24,51 +30,37 @@ window, decoration {
 
 .panel-root {
     background-color: #1a1b26;
-    border: 1px solid rgba(122, 162, 247, 0.25);
+    border: 1px solid rgba(122, 162, 247, 0.3);
     border-radius: 16px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    padding: 14px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
 
 .panel-header {
     background-color: #16161e;
-    border-radius: 16px 16px 0 0;
-    padding: 14px 16px 12px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .panel-title {
     color: #7aa2f7;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
     letter-spacing: 0.5px;
 }
 
-.close-btn {
-    color: #565f89;
-    font-size: 14px;
-    background: transparent;
-    border: none;
-    border-radius: 6px;
-    padding: 2px 8px;
-    min-width: 0;
-    min-height: 0;
-}
-
-.close-btn:hover {
-    color: #f7768e;
-    background-color: rgba(247, 118, 142, 0.12);
-}
-
 .conn-card {
     background-color: #24283b;
-    border: 1px solid rgba(122, 162, 247, 0.2);
+    border: 1px solid rgba(122, 162, 247, 0.25);
     border-radius: 12px;
-    margin: 12px 14px 8px;
+    margin-bottom: 10px;
     padding: 12px 14px;
 }
 
 .conn-icon {
-    font-size: 18px;
+    font-size: 20px;
     color: #73daca;
 }
 
@@ -101,7 +93,7 @@ window, decoration {
 .divider {
     background-color: rgba(255, 255, 255, 0.06);
     min-height: 1px;
-    margin: 4px 14px;
+    margin: 6px 0;
 }
 
 .section-label {
@@ -109,24 +101,24 @@ window, decoration {
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 1px;
-    margin: 10px 16px 6px;
+    margin: 8px 4px 6px;
 }
 
 .dev-row {
-    background: transparent;
-    border: 1px solid transparent;
+    background-color: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
     border-radius: 8px;
     padding: 8px 10px;
-    margin: 2px 10px;
+    margin-bottom: 4px;
 }
 
 .dev-row:hover {
     background-color: #24283b;
-    border-color: rgba(122, 162, 247, 0.15);
+    border-color: rgba(122, 162, 247, 0.2);
 }
 
 .dev-icon {
-    font-size: 14px;
+    font-size: 15px;
     color: #7aa2f7;
 }
 
@@ -137,7 +129,7 @@ window, decoration {
 }
 
 .action-btn {
-    background-color: rgba(122, 162, 247, 0.1);
+    background-color: rgba(122, 162, 247, 0.12);
     color: #7aa2f7;
     border: 1px solid rgba(122, 162, 247, 0.3);
     border-radius: 6px;
@@ -153,7 +145,7 @@ window, decoration {
 }
 
 .disconnect-btn {
-    background-color: rgba(247, 118, 142, 0.1);
+    background-color: rgba(247, 118, 142, 0.12);
     color: #f7768e;
     border: 1px solid rgba(247, 118, 142, 0.3);
     border-radius: 6px;
@@ -170,9 +162,10 @@ window, decoration {
 
 .panel-footer {
     background-color: #16161e;
-    border-radius: 0 0 16px 16px;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
-    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 10px;
+    margin-top: 10px;
 }
 
 .btn-footer {
@@ -223,65 +216,50 @@ DEVICE_ICON = {
     "default":          "󰂯",
 }
 
-def btctl_run(args):
+def get_dbus_devices():
+    if not HAS_DBUS:
+        return [], False
     try:
-        r = subprocess.run(
-            ["bluetoothctl"] + args,
-            capture_output=True, text=True, timeout=5, input=""
-        )
-        return r.stdout.strip()
-    except Exception:
-        return ""
+        bus = dbus.SystemBus()
+        manager = dbus.Interface(bus.get_object("org.bluez", "/"), "org.freedesktop.DBus.ObjectManager")
+        objects = manager.GetManagedObjects()
 
-def bt_service_active():
-    try:
-        r = subprocess.run(["systemctl", "is-active", "bluetooth"], capture_output=True, text=True, timeout=3)
-        return r.stdout.strip() == "active"
-    except Exception:
-        return False
+        powered = False
+        devices = []
 
-def bt_powered():
-    out = btctl_run(["show"])
-    return "Powered: yes" in out
+        for path, interfaces in objects.items():
+            if "org.bluez.Adapter1" in interfaces:
+                if bool(interfaces["org.bluez.Adapter1"].get("Powered", False)):
+                    powered = True
+
+            if "org.bluez.Device1" in interfaces:
+                dev = interfaces["org.bluez.Device1"]
+                name = str(dev.get("Name", dev.get("Alias", "Unknown")))
+                mac = str(dev.get("Address", ""))
+                connected = bool(dev.get("Connected", False))
+                paired = bool(dev.get("Paired", False))
+                raw_icon = str(dev.get("Icon", "default"))
+
+                battery = None
+                if "org.bluez.Battery1" in interfaces:
+                    battery = f"{int(interfaces['org.bluez.Battery1'].get('Percentage', 0))}%"
+
+                if paired or connected:
+                    devices.append({
+                        "mac": mac,
+                        "name": name,
+                        "connected": connected,
+                        "battery": battery,
+                        "icon": DEVICE_ICON.get(raw_icon, "󰂯"),
+                    })
+
+        devices.sort(key=lambda d: (not d["connected"], d["name"]))
+        return devices, powered
+    except Exception as e:
+        return [], False
 
 def set_bt_power(state: bool):
     subprocess.run(["bluetoothctl", "power", "on" if state else "off"], capture_output=True)
-
-def get_devices():
-    devices_out = btctl_run(["devices"])
-
-    devices = []
-    for line in devices_out.splitlines():
-        m = re.match(r"Device ([0-9A-F:]{17}) (.+)", line, re.I)
-        if not m:
-            continue
-        mac = m.group(1).upper()
-        name = m.group(2).strip()
-
-        info = btctl_run(["info", mac])
-        connected = "Connected: yes" in info
-
-        dev_type = "default"
-        for l in info.splitlines():
-            if "Icon:" in l:
-                raw = l.split("Icon:")[1].strip()
-                if raw in DEVICE_ICON:
-                    dev_type = raw
-                break
-
-        bat_match = re.search(r"Battery Percentage:.*\((\d+)\)", info)
-        battery = f"{bat_match.group(1)}%" if bat_match else None
-
-        devices.append({
-            "mac": mac,
-            "name": name,
-            "connected": connected,
-            "battery": battery,
-            "icon": DEVICE_ICON.get(dev_type, "󰂯"),
-        })
-
-    devices.sort(key=lambda d: (not d["connected"], d["name"]))
-    return devices
 
 
 class BTPanel(Gtk.Application):
@@ -292,7 +270,7 @@ class BTPanel(Gtk.Application):
     def do_activate(self):
         self.win = Gtk.ApplicationWindow(application=self)
         self.win.set_title("Bluetooth Control")
-        self.win.set_default_size(340, 1)
+        self.win.set_default_size(380, 1)
         self.win.set_decorated(False)
         self.win.set_resizable(False)
 
@@ -307,7 +285,7 @@ class BTPanel(Gtk.Application):
         root.add_css_class("panel-root")
         self.win.set_child(root)
 
-        # ── Header ────────────────────────────────────────
+        # ── Header (No Close [X] Button) ─────────────────
         header = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         header.add_css_class("panel-header")
 
@@ -320,24 +298,18 @@ class BTPanel(Gtk.Application):
         spacer = Gtk.Box()
         spacer.set_hexpand(True)
 
+        devices, powered = get_dbus_devices()
+
         self._switch = Gtk.Switch()
         self._switch.set_valign(Gtk.Align.CENTER)
-        self._switch.set_active(bt_powered())
+        self._switch.set_active(powered)
         self._switch.connect("state-set", self._on_switch_toggled)
 
-        close_btn = Gtk.Button(label="✕")
-        close_btn.add_css_class("close-btn")
-        close_btn.connect("clicked", lambda _: self.win.close())
-
-        for w in [bt_icon, title, spacer, self._switch, close_btn]:
-            header.append(w)
+        header.append(bt_icon)
+        header.append(title)
+        header.append(spacer)
+        header.append(self._switch)
         root.append(header)
-
-        # Check Service Status
-        if not bt_service_active():
-            self._show_service_error(root)
-            self.win.present()
-            return
 
         # ── Active Connection Card ────────────────────────
         conn_card = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
@@ -378,8 +350,8 @@ class BTPanel(Gtk.Application):
         # ── Device List ───────────────────────────────────
         scroll = Gtk.ScrolledWindow()
         scroll.set_vexpand(True)
-        scroll.set_min_content_height(180)
-        scroll.set_max_content_height(260)
+        scroll.set_min_content_height(160)
+        scroll.set_max_content_height(240)
         scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
 
         self._list_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
@@ -404,43 +376,16 @@ class BTPanel(Gtk.Application):
         footer.append(btn_set)
         root.append(footer)
 
-        # Keyboard shortcut ESC to close
+        # ESC key controller to close window cleanly
         kc = Gtk.EventControllerKey()
         kc.connect("key-pressed", lambda c, k, *a: self.win.close() if k == Gdk.KEY_Escape else False)
         self.win.add_controller(kc)
 
         self.win.present()
-        threading.Thread(target=self._load_data, daemon=True).start()
-
-    def _show_service_error(self, root):
-        card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
-        card.add_css_class("conn-card")
-
-        lbl = Gtk.Label(label="Bluetooth Service Inactive")
-        lbl.add_css_class("conn-name")
-        lbl.set_halign(Gtk.Align.START)
-
-        desc = Gtk.Label(label="Systemd bluetooth.service is stopped. Enable it to connect devices.")
-        desc.add_css_class("row-name")
-        desc.set_wrap(True)
-        desc.set_halign(Gtk.Align.START)
-
-        btn = Gtk.Button(label="Start Service")
-        btn.add_css_class("action-btn")
-        btn.set_halign(Gtk.Align.START)
-        btn.connect("clicked", self._on_start_service)
-
-        card.append(lbl)
-        card.append(desc)
-        card.append(btn)
-        root.append(card)
-
-    def _on_start_service(self, _):
-        subprocess.Popen(["pkexec", "systemctl", "enable", "--now", "bluetooth"])
-        self.win.close()
+        self._update_ui(devices)
 
     def _load_data(self):
-        devices = get_devices()
+        devices, _ = get_dbus_devices()
         GLib.idle_add(self._update_ui, devices)
 
     def _update_ui(self, devices):
@@ -466,8 +411,8 @@ class BTPanel(Gtk.Application):
         if not devices:
             lbl = Gtk.Label(label="No paired devices found")
             lbl.add_css_class("row-name")
-            lbl.set_margin_start(16)
-            lbl.set_margin_top(16)
+            lbl.set_margin_start(8)
+            lbl.set_margin_top(12)
             lbl.set_halign(Gtk.Align.START)
             self._list_box.append(lbl)
         else:
