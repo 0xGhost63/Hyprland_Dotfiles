@@ -74,6 +74,8 @@
             "format-wifi": "󰖩 {signalStrength}%",
             "format-ethernet": "󰈀 {ipaddr}",
             "format-disconnected": "󰖪 Disconnected",
+            "format-linked": "󰖩 No Internet",
+            "format-disabled": "󰖪 Disabled",
             "tooltip-format": "{ifname}: {ipaddr}/{cidr}\n{essid} ({signalStrength}%)\n↑ {bandwidthUpBits}  ↓ {bandwidthDownBits}",
             "on-click": "nm-connection-editor",
             "interval": 5

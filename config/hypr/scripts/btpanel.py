@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-# Bluetooth Panel — Ghost's ricing
-# Floating GTK4 panel triggered from Waybar
+# Bluetooth Panel — Sleek GTK4 Control Dialog
+# Triggered from Waybar right-click on Bluetooth module
 
 import gi
 import subprocess
@@ -15,251 +15,241 @@ GLib.set_application_name("Bluetooth Panel")
 
 CSS = b"""
 * {
-    font-family: "JetBrains Mono", "Iosevka", monospace;
+    font-family: "Inter", "JetBrains Mono Nerd Font", "JetBrains Mono", sans-serif;
 }
+
 window, decoration {
     background: transparent;
 }
+
 .panel-root {
-    background-color: #15161E;
-    border: 1px solid #f8a0b0;
-    border-radius: 12px;
+    background-color: #1a1b26;
+    border: 1px solid rgba(122, 162, 247, 0.25);
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
+
 .panel-header {
-    background-color: #0d0e17;
-    border-radius: 12px 12px 0 0;
-    padding: 12px 14px 10px;
-    border-bottom: 1px solid rgba(248,160,176,0.15);
+    background-color: #16161e;
+    border-radius: 16px 16px 0 0;
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
+
 .panel-title {
-    color: #bb9af7;
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 2.5px;
-}
-.toggle-on {
-    color: #bb9af7;
-    font-size: 10px;
+    color: #7aa2f7;
+    font-size: 13px;
     font-weight: 700;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
 }
-.toggle-off {
-    color: #565f89;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1px;
-}
+
 .close-btn {
     color: #565f89;
-    font-size: 12px;
+    font-size: 14px;
     background: transparent;
     border: none;
-    border-radius: 4px;
-    padding: 2px 6px;
+    border-radius: 6px;
+    padding: 2px 8px;
     min-width: 0;
     min-height: 0;
 }
+
 .close-btn:hover {
     color: #f7768e;
-    background-color: rgba(247,118,142,0.1);
+    background-color: rgba(247, 118, 142, 0.12);
 }
+
 .conn-card {
-    background-color: #1a1b26;
-    border: 1px solid rgba(248,160,176,0.15);
-    border-radius: 8px;
-    margin: 10px 10px 8px;
-    padding: 10px 12px;
+    background-color: #24283b;
+    border: 1px solid rgba(122, 162, 247, 0.2);
+    border-radius: 12px;
+    margin: 12px 14px 8px;
+    padding: 12px 14px;
 }
-.conn-type-badge {
-    background-color: rgba(187,154,247,0.12);
-    color: #bb9af7;
-    border: 1px solid rgba(187,154,247,0.25);
-    border-radius: 3px;
-    font-size: 9px;
-    font-weight: 700;
-    padding: 1px 6px;
-    letter-spacing: 1px;
+
+.conn-icon {
+    font-size: 18px;
+    color: #73daca;
 }
+
 .conn-name {
     color: #c0caf5;
     font-size: 13px;
     font-weight: 600;
 }
-.badge-audio {
-    background-color: rgba(187,154,247,0.12);
-    color: #bb9af7;
-    border: 1px solid rgba(187,154,247,0.3);
-    border-radius: 3px;
-    font-size: 9px;
-    font-weight: 700;
-    padding: 1px 6px;
-    letter-spacing: 0.8px;
+
+.badge-connected {
+    background-color: rgba(115, 218, 202, 0.15);
+    color: #73daca;
+    border: 1px solid rgba(115, 218, 202, 0.3);
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
 }
-.badge-none {
-    background-color: rgba(247,118,142,0.1);
-    color: #f7768e;
-    border: 1px solid rgba(247,118,142,0.25);
-    border-radius: 3px;
-    font-size: 9px;
-    font-weight: 700;
-    padding: 1px 6px;
-    letter-spacing: 0.8px;
+
+.badge-offline {
+    background-color: rgba(86, 95, 137, 0.15);
+    color: #565f89;
+    border: 1px solid rgba(86, 95, 137, 0.3);
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
 }
+
 .divider {
-    background-color: rgba(248,160,176,0.1);
+    background-color: rgba(255, 255, 255, 0.06);
     min-height: 1px;
-    margin: 0 10px;
+    margin: 4px 14px;
 }
+
 .section-label {
     color: #565f89;
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 700;
-    letter-spacing: 2px;
-    margin: 8px 14px 4px;
+    letter-spacing: 1px;
+    margin: 10px 16px 6px;
 }
-.net-row {
+
+.dev-row {
     background: transparent;
     border: 1px solid transparent;
-    border-radius: 7px;
-    padding: 6px 8px;
-    margin: 1px 8px;
-    min-height: 0;
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin: 2px 10px;
 }
-.net-row:hover {
-    background-color: #1a1b26;
-    border-color: rgba(248,160,176,0.1);
+
+.dev-row:hover {
+    background-color: #24283b;
+    border-color: rgba(122, 162, 247, 0.15);
 }
-.net-row-active {
-    background-color: #1a1b26;
-    border: 1px solid rgba(187,154,247,0.2);
-    border-radius: 7px;
-    padding: 6px 8px;
-    margin: 1px 8px;
-    min-height: 0;
+
+.dev-icon {
+    font-size: 14px;
+    color: #7aa2f7;
 }
-.dev-type-badge {
-    background-color: rgba(100,100,140,0.15);
-    color: #565f89;
-    border: 1px solid rgba(100,100,140,0.2);
-    border-radius: 3px;
-    font-size: 8px;
-    font-weight: 700;
-    padding: 0 5px;
-    letter-spacing: 0.5px;
-    min-width: 0;
-}
+
 .row-name {
     color: #a9b1d6;
     font-size: 12px;
+    font-weight: 500;
 }
-.row-name-active {
-    color: #c0caf5;
-    font-size: 12px;
+
+.action-btn {
+    background-color: rgba(122, 162, 247, 0.1);
+    color: #7aa2f7;
+    border: 1px solid rgba(122, 162, 247, 0.3);
+    border-radius: 6px;
+    font-size: 10px;
     font-weight: 600;
-}
-.badge-paired {
-    background-color: rgba(187,154,247,0.1);
-    color: #bb9af7;
-    border-radius: 3px;
-    font-size: 9px;
-    font-weight: 700;
-    padding: 1px 5px;
-    letter-spacing: 0.6px;
-}
-.connect-btn {
-    background: transparent;
-    color: #a9b1d6;
-    border: 1px solid #414868;
-    border-radius: 4px;
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    padding: 1px 7px;
+    padding: 3px 10px;
     min-height: 0;
-    min-width: 0;
 }
-.connect-btn:hover {
-    border-color: #bb9af7;
-    color: #bb9af7;
-    background-color: rgba(187,154,247,0.08);
+
+.action-btn:hover {
+    background-color: #7aa2f7;
+    color: #1a1b26;
 }
+
+.disconnect-btn {
+    background-color: rgba(247, 118, 142, 0.1);
+    color: #f7768e;
+    border: 1px solid rgba(247, 118, 142, 0.3);
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 10px;
+    min-height: 0;
+}
+
+.disconnect-btn:hover {
+    background-color: #f7768e;
+    color: #1a1b26;
+}
+
 .panel-footer {
-    background-color: #0d0e17;
-    border-radius: 0 0 12px 12px;
-    border-top: 1px solid rgba(248,160,176,0.12);
-    padding: 9px 10px 11px;
+    background-color: #16161e;
+    border-radius: 0 0 16px 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 12px 14px;
 }
-.btn-scan {
-    background: transparent;
-    color: #bb9af7;
-    border: 1px solid rgba(187,154,247,0.35);
-    border-radius: 6px;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    padding: 6px 0;
-    min-height: 0;
+
+.btn-footer {
+    background-color: rgba(122, 162, 247, 0.12);
+    color: #7aa2f7;
+    border: 1px solid rgba(122, 162, 247, 0.25);
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 7px 0;
 }
-.btn-scan:hover {
-    background-color: rgba(187,154,247,0.08);
-    border-color: #bb9af7;
+
+.btn-footer:hover {
+    background-color: #7aa2f7;
+    color: #1a1b26;
 }
-.btn-settings {
-    background: transparent;
-    color: #565f89;
-    border: 1px solid #414868;
-    border-radius: 6px;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    padding: 6px 0;
-    min-height: 0;
-}
-.btn-settings:hover {
-    background-color: #1a1b26;
-    border-color: rgba(248,160,176,0.3);
+
+.btn-secondary {
+    background-color: rgba(255, 255, 255, 0.04);
     color: #a9b1d6;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 7px 0;
 }
+
+.btn-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #c0caf5;
+}
+
 scrolledwindow { background: transparent; }
-scrolledwindow undershoot, overshoot { background: none; }
-scrollbar { background: transparent; min-width: 3px; }
-scrollbar slider { background-color: #414868; border-radius: 2px; min-width: 3px; }
+scrollbar { background: transparent; min-width: 4px; }
+scrollbar slider { background-color: #3b4261; border-radius: 4px; min-width: 4px; }
 """
 
-# Device type → short label (no Nerd Font)
-DEVICE_TYPE_LABEL = {
-    "audio-headphones": "AUDIO",
-    "audio-headset":    "AUDIO",
-    "audio-card":       "AUDIO",
-    "input-mouse":      "MOUSE",
-    "input-keyboard":   "KBD",
-    "input-gaming":     "CTRL",
-    "phone":            "PHONE",
-    "computer":         "PC",
-    "default":          "BT",
+# Icon mapping for Bluetooth device types
+DEVICE_ICON = {
+    "audio-headphones": "󰋋",
+    "audio-headset":    "󰋎",
+    "audio-card":       "󰓃",
+    "input-mouse":      "󰍽",
+    "input-keyboard":   "󰌌",
+    "input-gaming":     "󰄋",
+    "phone":            "󰏲",
+    "computer":         "󰌢",
+    "default":          "󰂯",
 }
 
 def btctl_run(args):
     try:
         r = subprocess.run(
             ["bluetoothctl"] + args,
-            capture_output=True, text=True, timeout=6, input=""
+            capture_output=True, text=True, timeout=5, input=""
         )
         return r.stdout.strip()
     except Exception:
         return ""
 
+def bt_service_active():
+    try:
+        r = subprocess.run(["systemctl", "is-active", "bluetooth"], capture_output=True, text=True, timeout=3)
+        return r.stdout.strip() == "active"
+    except Exception:
+        return False
+
 def bt_powered():
     out = btctl_run(["show"])
     return "Powered: yes" in out
 
-def set_bt(state: bool):
-    subprocess.run(["bluetoothctl", "power", "on" if state else "off"],
-                   capture_output=True)
+def set_bt_power(state: bool):
+    subprocess.run(["bluetoothctl", "power", "on" if state else "off"], capture_output=True)
 
 def get_devices():
-    paired_out   = btctl_run(["paired-devices"])
-    conn_out     = btctl_run(["info"])
+    paired_out = btctl_run(["paired-devices"])
+    conn_out = btctl_run(["info"])
 
     connected_mac = None
     for line in conn_out.splitlines():
@@ -273,7 +263,7 @@ def get_devices():
         m = re.match(r"Device ([0-9A-F:]{17}) (.+)", line, re.I)
         if not m:
             continue
-        mac  = m.group(1).upper()
+        mac = m.group(1).upper()
         name = m.group(2).strip()
 
         info = btctl_run(["info", mac])
@@ -281,15 +271,15 @@ def get_devices():
         for l in info.splitlines():
             if "Icon:" in l:
                 raw = l.split("Icon:")[1].strip()
-                if raw in DEVICE_TYPE_LABEL:
+                if raw in DEVICE_ICON:
                     dev_type = raw
                 break
 
         devices.append({
-            "mac":       mac,
-            "name":      name,
+            "mac": mac,
+            "name": name,
             "connected": mac == connected_mac,
-            "type_lbl":  DEVICE_TYPE_LABEL.get(dev_type, "BT"),
+            "icon": DEVICE_ICON.get(dev_type, "󰂯"),
         })
 
     devices.sort(key=lambda d: (not d["connected"], d["name"]))
@@ -303,8 +293,8 @@ class BTPanel(Gtk.Application):
 
     def do_activate(self):
         self.win = Gtk.ApplicationWindow(application=self)
-        self.win.set_title("Bluetooth Panel")
-        self.win.set_default_size(320, 1)
+        self.win.set_title("Bluetooth Control")
+        self.win.set_default_size(340, 1)
         self.win.set_decorated(False)
         self.win.set_resizable(False)
 
@@ -320,61 +310,64 @@ class BTPanel(Gtk.Application):
         self.win.set_child(root)
 
         # ── Header ────────────────────────────────────────
-        header = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
+        header = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         header.add_css_class("panel-header")
 
-        title = Gtk.Label(label="BLUETOOTH")
+        bt_icon = Gtk.Label(label="󰂯")
+        bt_icon.add_css_class("panel-title")
+
+        title = Gtk.Label(label="Bluetooth")
         title.add_css_class("panel-title")
 
         spacer = Gtk.Box()
         spacer.set_hexpand(True)
 
-        self._enabled = bt_powered()
-        self._toggle_lbl = Gtk.Label(label="ON" if self._enabled else "OFF")
-        self._toggle_lbl.add_css_class("toggle-on" if self._enabled else "toggle-off")
+        self._switch = Gtk.Switch()
+        self._switch.set_valign(Gtk.Align.CENTER)
+        self._switch.set_active(bt_powered())
+        self._switch.connect("state-set", self._on_switch_toggled)
 
-        toggle_btn = Gtk.Button(label="PWR")
-        toggle_btn.add_css_class("close-btn")
-        toggle_btn.connect("clicked", self._on_toggle)
+        close_btn = Gtk.Button(label="✕")
+        close_btn.add_css_class("close-btn")
+        close_btn.connect("clicked", lambda _: self.win.close())
 
-        close = Gtk.Button(label="X")
-        close.add_css_class("close-btn")
-        close.connect("clicked", lambda _: self.win.close())
-
-        for w in [title, spacer, self._toggle_lbl, toggle_btn, close]:
+        for w in [bt_icon, title, spacer, self._switch, close_btn]:
             header.append(w)
         root.append(header)
 
-        # ── Connected card ────────────────────────────────
-        conn_card = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        # Check Service Status
+        if not bt_service_active():
+            self._show_service_error(root)
+            self.win.present()
+            return
+
+        # ── Active Connection Card ────────────────────────
+        conn_card = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
         conn_card.add_css_class("conn-card")
 
-        left = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
-        left.set_valign(Gtk.Align.CENTER)
-        self._conn_type = Gtk.Label(label="BT")
-        self._conn_type.add_css_class("conn-type-badge")
-        left.append(self._conn_type)
+        self._conn_icon = Gtk.Label(label="󰂯")
+        self._conn_icon.add_css_class("conn-icon")
+        self._conn_icon.set_valign(Gtk.Align.CENTER)
 
-        info_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=3)
+        info_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
         info_box.set_hexpand(True)
 
-        self._conn_name = Gtk.Label(label="Scanning…")
+        self._conn_name = Gtk.Label(label="Scanning devices…")
         self._conn_name.add_css_class("conn-name")
         self._conn_name.set_halign(Gtk.Align.START)
 
-        sub = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
-        self._conn_badge = Gtk.Label(label="CONNECTED")
-        self._conn_badge.add_css_class("badge-audio")
-        sub.append(self._conn_badge)
+        self._conn_badge = Gtk.Label(label="Checking…")
+        self._conn_badge.add_css_class("badge-offline")
+        self._conn_badge.set_halign(Gtk.Align.START)
 
         info_box.append(self._conn_name)
-        info_box.append(sub)
+        info_box.append(self._conn_badge)
 
-        conn_card.append(left)
+        conn_card.append(self._conn_icon)
         conn_card.append(info_box)
         root.append(conn_card)
 
-        # ── Divider ───────────────────────────────────────
+        # ── Divider & Section Label ───────────────────────
         div = Gtk.Separator()
         div.add_css_class("divider")
         root.append(div)
@@ -384,28 +377,28 @@ class BTPanel(Gtk.Application):
         sec.set_halign(Gtk.Align.START)
         root.append(sec)
 
-        # ── Device list ───────────────────────────────────
+        # ── Device List ───────────────────────────────────
         scroll = Gtk.ScrolledWindow()
         scroll.set_vexpand(True)
         scroll.set_min_content_height(180)
         scroll.set_max_content_height(260)
         scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
 
-        self._list_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+        self._list_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
         scroll.set_child(self._list_box)
         root.append(scroll)
 
         # ── Footer ────────────────────────────────────────
-        footer = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
+        footer = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         footer.add_css_class("panel-footer")
 
-        self._btn_scan = Gtk.Button(label="SCAN")
-        self._btn_scan.add_css_class("btn-scan")
+        self._btn_scan = Gtk.Button(label="Scan Devices")
+        self._btn_scan.add_css_class("btn-footer")
         self._btn_scan.set_hexpand(True)
         self._btn_scan.connect("clicked", self._on_scan)
 
-        btn_set = Gtk.Button(label="SETTINGS")
-        btn_set.add_css_class("btn-settings")
+        btn_set = Gtk.Button(label="Manager")
+        btn_set.add_css_class("btn-secondary")
         btn_set.set_hexpand(True)
         btn_set.connect("clicked", lambda _: (subprocess.Popen(["blueman-manager"]), self.win.close()))
 
@@ -413,12 +406,40 @@ class BTPanel(Gtk.Application):
         footer.append(btn_set)
         root.append(footer)
 
+        # Keyboard shortcut ESC to close
         kc = Gtk.EventControllerKey()
         kc.connect("key-pressed", lambda c, k, *a: self.win.close() if k == Gdk.KEY_Escape else False)
         self.win.add_controller(kc)
 
         self.win.present()
         threading.Thread(target=self._load_data, daemon=True).start()
+
+    def _show_service_error(self, root):
+        card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+        card.add_css_class("conn-card")
+
+        lbl = Gtk.Label(label="Bluetooth Service Inactive")
+        lbl.add_css_class("conn-name")
+        lbl.set_halign(Gtk.Align.START)
+
+        desc = Gtk.Label(label="Systemd bluetooth.service is stopped. Enable it to connect devices.")
+        desc.add_css_class("row-name")
+        desc.set_wrap(True)
+        desc.set_halign(Gtk.Align.START)
+
+        btn = Gtk.Button(label="Start Service")
+        btn.add_css_class("action-btn")
+        btn.set_halign(Gtk.Align.START)
+        btn.connect("clicked", self._on_start_service)
+
+        card.append(lbl)
+        card.append(desc)
+        card.append(btn)
+        root.append(card)
+
+    def _on_start_service(self, _):
+        subprocess.Popen(["pkexec", "systemctl", "enable", "--now", "bluetooth"])
+        self.win.close()
 
     def _load_data(self):
         devices = get_devices()
@@ -429,39 +450,38 @@ class BTPanel(Gtk.Application):
 
         if connected:
             self._conn_name.set_text(connected["name"])
-            self._conn_type.set_text(connected["type_lbl"])
-            self._conn_badge.set_text("CONNECTED")
-            self._conn_badge.remove_css_class("badge-none")
-            self._conn_badge.add_css_class("badge-audio")
+            self._conn_icon.set_text(connected["icon"])
+            self._conn_badge.set_text("Connected")
+            self._conn_badge.remove_css_class("badge-offline")
+            self._conn_badge.add_css_class("badge-connected")
         else:
-            self._conn_name.set_text("No device connected")
-            self._conn_type.set_text("BT")
-            self._conn_badge.set_text("OFFLINE")
-            self._conn_badge.remove_css_class("badge-audio")
-            self._conn_badge.add_css_class("badge-none")
+            self._conn_name.set_text("No Device Connected")
+            self._conn_icon.set_text("󰂯")
+            self._conn_badge.set_text("Disconnected")
+            self._conn_badge.remove_css_class("badge-connected")
+            self._conn_badge.add_css_class("badge-offline")
 
         while self._list_box.get_first_child():
             self._list_box.remove(self._list_box.get_first_child())
 
-        unpaired = [d for d in devices if not d["connected"]]
-        if not unpaired:
-            lbl = Gtk.Label(label="No other paired devices")
-            lbl.add_css_class("badge-none")
-            lbl.set_margin_start(14)
-            lbl.set_margin_top(12)
+        if not devices:
+            lbl = Gtk.Label(label="No paired devices found")
+            lbl.add_css_class("row-name")
+            lbl.set_margin_start(16)
+            lbl.set_margin_top(16)
             lbl.set_halign(Gtk.Align.START)
             self._list_box.append(lbl)
         else:
-            for dev in unpaired:
+            for dev in devices:
                 self._add_device_row(dev)
         return False
 
     def _add_device_row(self, dev):
-        row_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
-        row_box.add_css_class("net-row")
+        row_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        row_box.add_css_class("dev-row")
 
-        type_lbl = Gtk.Label(label=dev["type_lbl"])
-        type_lbl.add_css_class("dev-type-badge")
+        icon_lbl = Gtk.Label(label=dev["icon"])
+        icon_lbl.add_css_class("dev-icon")
 
         name_lbl = Gtk.Label(label=dev["name"])
         name_lbl.add_css_class("row-name")
@@ -469,58 +489,53 @@ class BTPanel(Gtk.Application):
         name_lbl.set_halign(Gtk.Align.START)
         name_lbl.set_ellipsize(Pango.EllipsizeMode.END)
 
-        right = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
+        if dev["connected"]:
+            action_btn = Gtk.Button(label="Disconnect")
+            action_btn.add_css_class("disconnect-btn")
+            action_btn.connect("clicked", lambda b, m=dev["mac"]: self._on_disconnect_dev(m))
+        else:
+            action_btn = Gtk.Button(label="Connect")
+            action_btn.add_css_class("action-btn")
+            action_btn.connect("clicked", lambda b, m=dev["mac"]: self._on_connect_dev(m))
 
-        status = Gtk.Label(label="PAIRED")
-        status.add_css_class("badge-paired")
-
-        conn_btn = Gtk.Button(label="CONNECT")
-        conn_btn.add_css_class("connect-btn")
-        conn_btn.connect("clicked", lambda b, m=dev["mac"]: self._on_connect_dev(m))
-
-        right.append(status)
-        right.append(conn_btn)
-
-        row_box.append(type_lbl)
+        row_box.append(icon_lbl)
         row_box.append(name_lbl)
-        row_box.append(right)
+        row_box.append(action_btn)
         self._list_box.append(row_box)
 
     def _on_connect_dev(self, mac):
         subprocess.Popen(["bluetoothctl", "connect", mac])
-        GLib.timeout_add(2000, lambda: threading.Thread(target=self._load_data, daemon=True).start() or False)
+        GLib.timeout_add(1500, lambda: threading.Thread(target=self._load_data, daemon=True).start() or False)
+
+    def _on_disconnect_dev(self, mac):
+        subprocess.Popen(["bluetoothctl", "disconnect", mac])
+        GLib.timeout_add(1500, lambda: threading.Thread(target=self._load_data, daemon=True).start() or False)
 
     def _on_scan(self, _):
         if self._scanning:
             return
         self._scanning = True
-        self._btn_scan.set_label("SCANNING...")
+        self._btn_scan.set_label("Scanning…")
         self._btn_scan.set_sensitive(False)
 
         def scan():
-            subprocess.run(["bluetoothctl", "scan", "on"],
-                           capture_output=True, timeout=10)
+            subprocess.run(["bluetoothctl", "scan", "on"], capture_output=True, timeout=8)
 
         def after():
             self._scanning = False
-            self._btn_scan.set_label("SCAN")
+            self._btn_scan.set_label("Scan Devices")
             self._btn_scan.set_sensitive(True)
             threading.Thread(target=self._load_data, daemon=True).start()
             return False
 
-        threading.Thread(
-            target=lambda: (scan(), GLib.idle_add(after)),
-            daemon=True
-        ).start()
+        threading.Thread(target=lambda: (scan(), GLib.idle_add(after)), daemon=True).start()
 
-    def _on_toggle(self, _):
-        self._enabled = not self._enabled
-        set_bt(self._enabled)
-        self._toggle_lbl.set_text("ON" if self._enabled else "OFF")
-        self._toggle_lbl.remove_css_class("toggle-on" if not self._enabled else "toggle-off")
-        self._toggle_lbl.add_css_class("toggle-on" if self._enabled else "toggle-off")
+    def _on_switch_toggled(self, switch, state):
+        set_bt_power(state)
         GLib.timeout_add(800, lambda: threading.Thread(target=self._load_data, daemon=True).start() or False)
+        return False
 
 
-app = BTPanel()
-app.run(None)
+if __name__ == "__main__":
+    app = BTPanel()
+    app.run(None)

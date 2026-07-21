@@ -120,7 +120,11 @@ window#waybar {
     color: @green;
 }
 
-#network.disconnected {
+#network.disconnected, #network.disabled {
+    color: @overlay0;
+}
+
+#network.linked {
     color: @red;
 }
 
