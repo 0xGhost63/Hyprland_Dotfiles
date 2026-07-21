@@ -233,6 +233,7 @@ progressbar {
 .widget-mpris-album-art {
   border-radius: 12px;
   margin: 6px 0 0 2px;
+  opacity: 0;
 }
  
 .widget-mpris-title {

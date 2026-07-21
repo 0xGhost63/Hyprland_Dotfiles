@@ -1,6 +1,6 @@
 [SddmGreeterTheme]
-Name=Login theme
-Description=Login theme
+Name=LoginTheme
+Description=LoginTheme
 Author=keyitdev
 License=GPL-3.0-or-later
 Type=sddm-theme
@@ -9,4 +9,4 @@ Screenshot=Previews/preview.png
 MainScript=Main.qml
 ConfigFile=theme.conf
 TranslationsDirectory=translations
-Theme-Id=Login theme
+Theme-Id=LoginTheme

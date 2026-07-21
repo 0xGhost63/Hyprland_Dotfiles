@@ -123,26 +123,26 @@ if command -v sddm &> /dev/null || [ -d /usr/share/sddm ]; then
         fi
 
         # Deploy theme to system directory
-        if [ -d "$BASE_DIR/config/Login theme" ]; then
-            log_info "Deploying theme to /usr/share/sddm/themes/Login theme..."
+        if [ -d "$BASE_DIR/config/LoginTheme" ]; then
+            log_info "Deploying theme to /usr/share/sddm/themes/LoginTheme..."
             sudo mkdir -p /usr/share/sddm/themes
-            sudo rm -rf "/usr/share/sddm/themes/Login theme"
-            sudo cp -r "$BASE_DIR/config/Login theme" "/usr/share/sddm/themes/Login theme"
+            sudo rm -rf "/usr/share/sddm/themes/LoginTheme"
+            sudo cp -r "$BASE_DIR/config/LoginTheme" "/usr/share/sddm/themes/LoginTheme"
             
             # Fix ownership/permissions of copied files
-            sudo chown -R root:root "/usr/share/sddm/themes/Login theme"
-            sudo chmod -R 755 "/usr/share/sddm/themes/Login theme"
+            sudo chown -R root:root "/usr/share/sddm/themes/LoginTheme"
+            sudo chmod -R 755 "/usr/share/sddm/themes/LoginTheme"
             log_success "Theme successfully copied."
         else
-            log_error "Login theme folder was not found at $BASE_DIR/config/Login theme."
+            log_error "LoginTheme folder was not found at $BASE_DIR/config/LoginTheme."
         fi
 
         # Copy custom theme fonts
-        if [ -d "$BASE_DIR/config/Login theme/Fonts" ]; then
+        if [ -d "$BASE_DIR/config/LoginTheme/Fonts" ]; then
             log_info "Installing theme fonts to system directories..."
             sudo mkdir -p /usr/share/fonts/truetype/sddm-astronaut
             sudo rm -f /usr/share/fonts/truetype/sddm-astronaut/*
-            sudo cp -r "$BASE_DIR/config/Login theme/Fonts/"* /usr/share/fonts/truetype/sddm-astronaut/
+            sudo cp -r "$BASE_DIR/config/LoginTheme/Fonts/"* /usr/share/fonts/truetype/sddm-astronaut/
             sudo chown -R root:root /usr/share/fonts/truetype/sddm-astronaut
             sudo chmod 644 /usr/share/fonts/truetype/sddm-astronaut/*
             sudo fc-cache -f
@@ -161,15 +161,15 @@ if command -v sddm &> /dev/null || [ -d /usr/share/sddm ]; then
             log_info "Backing up existing SDDM configuration at $KDE_SETTINGS_CONF"
             sudo cp "$KDE_SETTINGS_CONF" "${KDE_SETTINGS_CONF}.backup_$(date +%Y%m%d_%H%M%S)"
             
-            log_info "Updating theme setting to Login theme inside $KDE_SETTINGS_CONF"
+            log_info "Updating theme setting to LoginTheme inside $KDE_SETTINGS_CONF"
             if grep -q "Current=" "$KDE_SETTINGS_CONF"; then
-                sudo sed -i 's/Current=.*/Current=Login theme/g' "$KDE_SETTINGS_CONF"
+                sudo sed -i 's/Current=.*/Current=LoginTheme/g' "$KDE_SETTINGS_CONF"
             else
                 # Add [Theme] block if missing or just append theme line
                 if grep -q "\[Theme\]" "$KDE_SETTINGS_CONF"; then
-                    sudo sed -i '/\[Theme\]/a Current=Login theme' "$KDE_SETTINGS_CONF"
+                    sudo sed -i '/\[Theme\]/a Current=LoginTheme' "$KDE_SETTINGS_CONF"
                 else
-                    echo -e "\n[Theme]\nCurrent=Login theme" | sudo tee -a "$KDE_SETTINGS_CONF" > /dev/null
+                    echo -e "\n[Theme]\nCurrent=LoginTheme" | sudo tee -a "$KDE_SETTINGS_CONF" > /dev/null
                 fi
             fi
         else
@@ -177,7 +177,7 @@ if command -v sddm &> /dev/null || [ -d /usr/share/sddm ]; then
             if [ -f "$FALLBACK_CONF" ]; then
                 sudo cp "$FALLBACK_CONF" "${FALLBACK_CONF}.backup_$(date +%Y%m%d_%H%M%S)"
             fi
-            echo -e "[Theme]\nCurrent=Login theme" | sudo tee "$FALLBACK_CONF" > /dev/null
+            echo -e "[Theme]\nCurrent=LoginTheme" | sudo tee "$FALLBACK_CONF" > /dev/null
         fi
         log_success "SDDM configuration updated successfully."
     else
@@ -197,5 +197,6 @@ echo ""
 echo -e "${GREEN}==================================================${NC}"
 echo -e "${GREEN}      Environment Installation Completed!        ${NC}"
 echo -e "${GREEN}==================================================${NC}"
-echo "You can test the SDDM theme by running:"
-echo "sddm-greeter --test-mode --theme \"/usr/share/sddm/themes/Login theme/\""
+echo ""
+echo -e "You can test the deployed SDDM theme in test-mode with:"
+echo "sddm-greeter --test-mode --theme \"/usr/share/sddm/themes/LoginTheme/\""

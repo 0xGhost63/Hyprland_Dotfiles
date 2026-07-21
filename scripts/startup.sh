@@ -10,7 +10,7 @@ hyprctl dispatch exec "brave"
 
 # 2. Spotify Music on Workspace 2
 hyprctl dispatch workspace 2
-hyprctl dispatch exec "spotify"
+hyprctl dispatch exec "spotify-launcher"
 
 # 3. WhatsApp Client on Workspace 6
 hyprctl dispatch workspace 6

@@ -25,23 +25,23 @@ CSS = b"""
 }
 
 window, decoration {
-    background: transparent;
+    background-color: #1a1b26;
+    border: 1px solid rgba(122, 162, 247, 0.35);
+    border-radius: 16px;
 }
 
 .panel-root {
-    background-color: #1a1b26;
-    border: 1px solid rgba(122, 162, 247, 0.3);
-    border-radius: 16px;
-    padding: 14px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    background-color: transparent;
+    border: none;
+    padding: 16px;
 }
 
 .panel-header {
     background-color: #16161e;
     border-radius: 12px;
     padding: 10px 14px;
-    margin-bottom: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    margin-bottom: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .panel-title {
@@ -55,7 +55,7 @@ window, decoration {
     background-color: #24283b;
     border: 1px solid rgba(122, 162, 247, 0.25);
     border-radius: 12px;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     padding: 12px 14px;
 }
 
@@ -73,8 +73,8 @@ window, decoration {
 .badge-connected {
     background-color: rgba(115, 218, 202, 0.15);
     color: #73daca;
-    border: 1px solid rgba(115, 218, 202, 0.3);
-    border-radius: 4px;
+    border: 1px solid rgba(115, 218, 202, 0.35);
+    border-radius: 6px;
     font-size: 10px;
     font-weight: 600;
     padding: 2px 8px;
@@ -83,15 +83,15 @@ window, decoration {
 .badge-offline {
     background-color: rgba(86, 95, 137, 0.15);
     color: #565f89;
-    border: 1px solid rgba(86, 95, 137, 0.3);
-    border-radius: 4px;
+    border: 1px solid rgba(86, 95, 137, 0.35);
+    border-radius: 6px;
     font-size: 10px;
     font-weight: 600;
     padding: 2px 8px;
 }
 
 .divider {
-    background-color: rgba(255, 255, 255, 0.06);
+    background-color: rgba(255, 255, 255, 0.08);
     min-height: 1px;
     margin: 6px 0;
 }
@@ -105,20 +105,20 @@ window, decoration {
 }
 
 .dev-row {
-    background-color: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.04);
+    background-color: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 8px;
-    padding: 8px 10px;
+    padding: 8px 12px;
     margin-bottom: 4px;
 }
 
 .dev-row:hover {
     background-color: #24283b;
-    border-color: rgba(122, 162, 247, 0.2);
+    border-color: rgba(122, 162, 247, 0.25);
 }
 
 .dev-icon {
-    font-size: 15px;
+    font-size: 16px;
     color: #7aa2f7;
 }
 
@@ -129,13 +129,13 @@ window, decoration {
 }
 
 .action-btn {
-    background-color: rgba(122, 162, 247, 0.12);
+    background-color: rgba(122, 162, 247, 0.14);
     color: #7aa2f7;
-    border: 1px solid rgba(122, 162, 247, 0.3);
+    border: 1px solid rgba(122, 162, 247, 0.35);
     border-radius: 6px;
     font-size: 10px;
     font-weight: 600;
-    padding: 3px 10px;
+    padding: 4px 12px;
     min-height: 0;
 }
 
@@ -145,13 +145,13 @@ window, decoration {
 }
 
 .disconnect-btn {
-    background-color: rgba(247, 118, 142, 0.12);
+    background-color: rgba(247, 118, 142, 0.14);
     color: #f7768e;
-    border: 1px solid rgba(247, 118, 142, 0.3);
+    border: 1px solid rgba(247, 118, 142, 0.35);
     border-radius: 6px;
     font-size: 10px;
     font-weight: 600;
-    padding: 3px 10px;
+    padding: 4px 12px;
     min-height: 0;
 }
 
@@ -163,15 +163,15 @@ window, decoration {
 .panel-footer {
     background-color: #16161e;
     border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     padding: 10px;
-    margin-top: 10px;
+    margin-top: 12px;
 }
 
 .btn-footer {
-    background-color: rgba(122, 162, 247, 0.12);
+    background-color: rgba(122, 162, 247, 0.14);
     color: #7aa2f7;
-    border: 1px solid rgba(122, 162, 247, 0.25);
+    border: 1px solid rgba(122, 162, 247, 0.3);
     border-radius: 8px;
     font-size: 11px;
     font-weight: 600;
@@ -184,9 +184,9 @@ window, decoration {
 }
 
 .btn-secondary {
-    background-color: rgba(255, 255, 255, 0.04);
+    background-color: rgba(255, 255, 255, 0.05);
     color: #a9b1d6;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 8px;
     font-size: 11px;
     font-weight: 600;
@@ -194,7 +194,7 @@ window, decoration {
 }
 
 .btn-secondary:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.12);
     color: #c0caf5;
 }
 
@@ -270,7 +270,7 @@ class BTPanel(Gtk.Application):
     def do_activate(self):
         self.win = Gtk.ApplicationWindow(application=self)
         self.win.set_title("Bluetooth Control")
-        self.win.set_default_size(380, 1)
+        self.win.set_default_size(380, 440)
         self.win.set_decorated(False)
         self.win.set_resizable(False)
 
@@ -285,7 +285,7 @@ class BTPanel(Gtk.Application):
         root.add_css_class("panel-root")
         self.win.set_child(root)
 
-        # ── Header (No Close [X] Button) ─────────────────
+        # ── Header ────────────────────────────────────────
         header = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         header.add_css_class("panel-header")
 
@@ -350,8 +350,8 @@ class BTPanel(Gtk.Application):
         # ── Device List ───────────────────────────────────
         scroll = Gtk.ScrolledWindow()
         scroll.set_vexpand(True)
-        scroll.set_min_content_height(160)
-        scroll.set_max_content_height(240)
+        scroll.set_min_content_height(180)
+        scroll.set_max_content_height(260)
         scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
 
         self._list_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)

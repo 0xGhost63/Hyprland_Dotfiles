@@ -25,7 +25,7 @@ elif [[ "$1" == "--tr" ]]; then
 	close_dash && kitty &
 
 elif [[ "$1" == "--fm" ]]; then
-	close_dash && dolphin &
+	close_dash && QT_QPA_PLATFORMTHEME=qt6ct dolphin &
 
 elif [[ "$1" == "--ge" || "$1" == "--sp" ]]; then
 	close_dash && (command -v spotify-launcher &>/dev/null && spotify-launcher || spotify) &

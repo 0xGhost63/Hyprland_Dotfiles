@@ -6,3 +6,5 @@ config/waybar/backups/
 *_backup_*
 .cache/
 *REFERNCE*
+REFERENCE_DOTFILES/
+REFERENCE_DOTFILES
