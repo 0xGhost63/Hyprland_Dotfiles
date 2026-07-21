@@ -187,6 +187,12 @@ else
     log_info "SDDM is not installed or /usr/share/sddm folder is missing. Skipping theme installation."
 fi
 
+# Enable Bluetooth systemd service
+if command -v systemctl &>/dev/null; then
+    log_info "Ensuring Bluetooth service is enabled..."
+    sudo systemctl enable --now bluetooth 2>/dev/null || true
+fi
+
 echo ""
 echo -e "${GREEN}==================================================${NC}"
 echo -e "${GREEN}      Environment Installation Completed!        ${NC}"
