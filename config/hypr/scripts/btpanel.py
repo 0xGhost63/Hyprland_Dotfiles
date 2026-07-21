@@ -248,18 +248,10 @@ def set_bt_power(state: bool):
     subprocess.run(["bluetoothctl", "power", "on" if state else "off"], capture_output=True)
 
 def get_devices():
-    paired_out = btctl_run(["paired-devices"])
-    conn_out = btctl_run(["info"])
-
-    connected_mac = None
-    for line in conn_out.splitlines():
-        m = re.match(r"Device ([0-9A-F:]{17})", line, re.I)
-        if m:
-            connected_mac = m.group(1).upper()
-            break
+    devices_out = btctl_run(["devices"])
 
     devices = []
-    for line in paired_out.splitlines():
+    for line in devices_out.splitlines():
         m = re.match(r"Device ([0-9A-F:]{17}) (.+)", line, re.I)
         if not m:
             continue
@@ -267,6 +259,8 @@ def get_devices():
         name = m.group(2).strip()
 
         info = btctl_run(["info", mac])
+        connected = "Connected: yes" in info
+
         dev_type = "default"
         for l in info.splitlines():
             if "Icon:" in l:
@@ -275,10 +269,14 @@ def get_devices():
                     dev_type = raw
                 break
 
+        bat_match = re.search(r"Battery Percentage:.*\((\d+)\)", info)
+        battery = f"{bat_match.group(1)}%" if bat_match else None
+
         devices.append({
             "mac": mac,
             "name": name,
-            "connected": mac == connected_mac,
+            "connected": connected,
+            "battery": battery,
             "icon": DEVICE_ICON.get(dev_type, "󰂯"),
         })
 
@@ -451,7 +449,8 @@ class BTPanel(Gtk.Application):
         if connected:
             self._conn_name.set_text(connected["name"])
             self._conn_icon.set_text(connected["icon"])
-            self._conn_badge.set_text("Connected")
+            bat_str = f"Connected ({connected['battery']})" if connected.get("battery") else "Connected"
+            self._conn_badge.set_text(bat_str)
             self._conn_badge.remove_css_class("badge-offline")
             self._conn_badge.add_css_class("badge-connected")
         else:
@@ -483,7 +482,8 @@ class BTPanel(Gtk.Application):
         icon_lbl = Gtk.Label(label=dev["icon"])
         icon_lbl.add_css_class("dev-icon")
 
-        name_lbl = Gtk.Label(label=dev["name"])
+        name_str = f"{dev['name']} ({dev['battery']})" if dev.get("battery") else dev["name"]
+        name_lbl = Gtk.Label(label=name_str)
         name_lbl.add_css_class("row-name")
         name_lbl.set_hexpand(True)
         name_lbl.set_halign(Gtk.Align.START)
