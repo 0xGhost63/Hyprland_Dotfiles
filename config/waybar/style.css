@@ -124,6 +124,18 @@ window#waybar {
     color: @red;
 }
 
+#bluetooth {
+    color: @blue;
+}
+
+#bluetooth.disabled, #bluetooth.off {
+    color: @overlay0;
+}
+
+#bluetooth.connected {
+    color: @sapphire;
+}
+
 #pulseaudio {
     color: @blue;
 }
@@ -174,7 +186,7 @@ tooltip label {
     color: @text;
 }
 /* vswaybar:modpad */
-window#waybar #clock, window#waybar #cpu, window#waybar #memory, window#waybar #network,
+window#waybar #clock, window#waybar #cpu, window#waybar #memory, window#waybar #network, window#waybar #bluetooth,
 window#waybar #pulseaudio, window#waybar #battery, window#waybar #tray,
 window#waybar #custom-updates, window#waybar #custom-weather, window#waybar #custom-swaync,
 window#waybar #custom-power, window#waybar #custom-settings, window#waybar #custom-claudebar,
