@@ -1,0 +1,98 @@
+window#osd {
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+#container {
+    background-color: rgba(26, 27, 38, 0.92);
+    border: none;
+    box-shadow: none;
+    border-radius: 9999px;
+    padding: 12px 24px;
+}
+
+image, label {
+    color: #7aa2f7;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+progressbar {
+    min-width: 140px;
+    min-height: 8px;
+    border-radius: 9999px;
+    background-color: rgba(255, 255, 255, 0.12);
+    border: none;
+    margin-left: 12px;
+}
+
+trough {
+    min-width: 140px;
+    min-height: 8px;
+    border-radius: 9999px;
+    background-color: rgba(255, 255, 255, 0.12);
+    border: none;
+}
+
+progress {
+    min-height: 8px;
+    border-radius: 9999px;
+    background-image: none !important;
+    background-color: #7aa2f7 !important;
+    border: none;
+}
+
+/* Red indicator when volume exceeds 100% */
+window#osd.overvolume #container,
+window#osd.overamplified #container,
+window#osd.volume-overamplified #container,
+.overvolume #container,
+.overamplified #container,
+.volume-overamplified #container,
+#container.overvolume,
+#container.overamplified,
+#container.volume-overamplified {
+    border: 2px solid #f7768e !important;
+}
+
+window#osd.overvolume progress,
+window#osd.overamplified progress,
+window#osd.volume-overamplified progress,
+.overvolume progress,
+.overamplified progress,
+.volume-overamplified progress,
+progress.overvolume,
+progress.overamplified,
+progress.volume-overamplified,
+progressbar.overvolume progress,
+progressbar.overamplified progress,
+progressbar.volume-overamplified progress,
+progressbar:high progress,
+progress:high,
+.high progress {
+    background-image: none !important;
+    background-color: #f7768e !important;
+}
+
+window#osd.overvolume image,
+window#osd.overamplified image,
+window#osd.volume-overamplified image,
+window#osd.overvolume label,
+window#osd.overamplified label,
+window#osd.volume-overamplified label,
+.overvolume image,
+.overamplified image,
+.volume-overamplified image,
+.overvolume label,
+.overamplified label,
+.volume-overamplified label,
+image.sink-volume-overamplified-symbolic,
+image.overvolume,
+image.overamplified,
+image.volume-overamplified,
+label.overvolume,
+label.overamplified,
+label.volume-overamplified {
+    color: #f7768e !important;
+}

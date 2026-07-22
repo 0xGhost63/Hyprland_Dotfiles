@@ -1,0 +1,73 @@
+{
+    "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+    "logo": {
+        "type": "kitty",
+        "source": "/home/sannan/dotfiles/config/fastfetch/ghost_nobg.png",
+        "width": 14,
+        "height": 7,
+        "preserveAspectRatio": true,
+        "padding": {
+            "top": 1,
+            "left": 1,
+            "right": 2
+        }
+    },
+    "display": {
+        "separator": " › "
+    },
+    "modules": [
+        "title",
+        {
+            "type": "custom",
+            "format": "-----------------------------------"
+        },
+        {
+            "type": "os",
+            "key": "  󰣇 OS",
+            "keyColor": "34"
+        },
+        {
+            "type": "kernel",
+            "key": "  󰌽 Kernel",
+            "keyColor": "34"
+        },
+        {
+            "type": "uptime",
+            "key": "  󰔟 Uptime",
+            "keyColor": "34"
+        },
+        {
+            "type": "packages",
+            "key": "  󰏖 Pkgs",
+            "keyColor": "34"
+        },
+        {
+            "type": "shell",
+            "key": "  󰞷 Shell",
+            "keyColor": "34"
+        },
+        {
+            "type": "wm",
+            "key": "  󰨇 WM",
+            "keyColor": "34"
+        },
+        {
+            "type": "terminal",
+            "key": "  󰞅 Term",
+            "keyColor": "34"
+        },
+        {
+            "type": "memory",
+            "key": "  󰍛 RAM",
+            "keyColor": "34"
+        },
+        {
+            "type": "custom",
+            "format": "-----------------------------------"
+        },
+        {
+            "type": "colors",
+            "symbol": "circle"
+        }
+    ]
+}

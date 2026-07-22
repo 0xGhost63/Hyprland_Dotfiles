@@ -1,0 +1,6 @@
+[server]
+style = "/home/sannan/dotfiles/config/swayosd/style.css"
+max_volume = 150
+show_percentage = false
+
+[client]
