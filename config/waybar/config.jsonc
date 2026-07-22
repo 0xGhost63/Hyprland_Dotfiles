@@ -14,6 +14,7 @@
             "mpris"
         ],
         "modules-center": [
+            "custom/cava",
             "clock"
         ],
         "modules-right": [
@@ -51,6 +52,11 @@
             "format": "{}",
             "max-length": 60,
             "separate-outputs": true
+        },
+        "custom/cava": {
+            "exec": "~/.config/hypr/scripts/waybarcava.sh",
+            "format": "{}",
+            "tooltip": false
         },
         "clock": {
             "format": "{:%H:%M  |  %A %d %B}",

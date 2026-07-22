@@ -209,9 +209,10 @@ window#waybar #custom-vscode {
     padding: 0 10px;
     color: #bd93f9;
 }
-window#waybar #custom-vscode {
+window#waybar #custom-cava {
     padding: 0 10px;
-    color: #bd93f9;
+    color: #7aa2f7;
+    font-family: "JetBrainsMono Nerd Font", monospace;
 }
 
 

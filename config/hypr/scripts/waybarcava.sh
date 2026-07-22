@@ -1,28 +1,22 @@
-#!/bin/bash
-# /* ---- 💫 https://github.com/JaKooLit 💫 ---- */  ##
-# Not my own work. This was added through Github PR. Credit to original author
+#!/usr/bin/env python3
+import os
+import sys
+import subprocess
+import signal
 
-#----- Optimized bars animation without much CPU usage increase --------
-bar="▁▂▃▄▅▆▇█"
-dict="s/;//g"
+config_file = "/tmp/bar_cava_config"
+with open(config_file, "w") as f:
+    f.write("""[general]
+framerate = 60
+bars = 14
+autosens = 1
+sensitivity = 100
 
-# Calculate the length of the bar outside the loop
-bar_length=${#bar}
-
-# Create dictionary to replace char with bar
-for ((i = 0; i < bar_length; i++)); do
-    dict+=";s/$i/${bar:$i:1}/g"
-done
-
-# Create cava config
-config_file="/tmp/bar_cava_config"
-cat >"$config_file" <<EOF
-[general]
-# Older systems show significant CPU use with default framerate
-# Setting maximum framerate to 30  
-# You can increase the value if you wish
-framerate = 30
-bars = 10
+[smoothing]
+integral = 70
+monstercat = 1
+waves = 0
+gravity = 100
 
 [input]
 method = pulse
@@ -32,11 +26,43 @@ source = auto
 method = raw
 raw_target = /dev/stdout
 data_format = ascii
-ascii_max_range = 7
-EOF
+ascii_max_range = 8
+""")
 
-# Kill cava if it's already running
-pkill -f "cava -p $config_file"
+subprocess.run(["pkill", "-f", f"cava -p {config_file}"], stderr=subprocess.DEVNULL)
 
-# Read stdout from cava and perform substitution in a single sed command
-cava -p "$config_file" | sed -u "$dict"
+proc = subprocess.Popen(
+    ["cava", "-p", config_file],
+    stdout=subprocess.PIPE,
+    stderr=subprocess.DEVNULL,
+    text=True,
+    bufsize=1
+)
+
+bars = [" ", " ", "▂", "▃", "▄", "▅", "▆", "▇", "█"]
+
+try:
+    for line in proc.stdout:
+        line = line.strip().rstrip(";")
+        if not line:
+            continue
+        parts = line.split(";")
+        out = ""
+        is_silent = True
+        for p in parts:
+            try:
+                v = int(p)
+                if v > 0:
+                    is_silent = False
+                if v < 0: v = 0
+                if v >= len(bars): v = len(bars) - 1
+                out += bars[v]
+            except ValueError:
+                pass
+        if is_silent:
+            sys.stdout.write("\n")
+        else:
+            sys.stdout.write(out + "\n")
+        sys.stdout.flush()
+except KeyboardInterrupt:
+    proc.terminate()
