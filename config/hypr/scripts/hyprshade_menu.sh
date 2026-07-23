@@ -11,40 +11,32 @@ selected=$(echo "$OPTIONS" | rofi -dmenu -p "Display & Theme" -i)
 
 case "$selected" in
     "Night Light (Warm 3500K)")
-        if command -v hyprsunset &>/dev/null; then
-            pkill hyprsunset 2>/dev/null
-            hyprsunset -t 3500 &
-            notify-send -u low "Night Light" "Applied Warm 3500K Filter"
-        else
-            notify-send "Night Light" "hyprsunset is not installed. Run: sudo pacman -S hyprsunset"
-        fi
+        pkill hyprsunset 2>/dev/null
+        pkill -9 hyprsunset 2>/dev/null
+        hyprsunset -t 3500 >/dev/null 2>&1 &
+        hyprctl reload
+        notify-send -u low "Night Light" "Applied Warm 3500K Filter"
         ;;
     "Sunset Mode (Medium 4500K)")
-        if command -v hyprsunset &>/dev/null; then
-            pkill hyprsunset 2>/dev/null
-            hyprsunset -t 4500 &
-            notify-send -u low "Night Light" "Applied Medium 4500K Filter"
-        else
-            notify-send "Night Light" "hyprsunset is not installed. Run: sudo pacman -S hyprsunset"
-        fi
+        pkill hyprsunset 2>/dev/null
+        pkill -9 hyprsunset 2>/dev/null
+        hyprsunset -t 4500 >/dev/null 2>&1 &
+        hyprctl reload
+        notify-send -u low "Night Light" "Applied Medium 4500K Filter"
         ;;
     "Clear Night Light (Normal)")
         pkill hyprsunset 2>/dev/null
+        pkill -9 hyprsunset 2>/dev/null
         hyprctl keyword decoration:screen_shader "" 2>/dev/null
+        hyprctl reload
         notify-send -u low "Night Light" "Restored Normal Display"
         ;;
     "Dark Mode (System)")
-        gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' 2>/dev/null
-        gsettings set org.gnome.desktop.interface gtk-theme 'Sweet-Dark' 2>/dev/null
-        sed -i 's/ColorScheme=.*/ColorScheme=BreezeDark/' ~/.config/kdeglobals 2>/dev/null
-        sed -i 's/ColorScheme=.*/ColorScheme=BreezeDark/' ~/.config/dolphinrc 2>/dev/null
-        notify-send -u low "System Theme" "Switched to Dark Mode"
+        bash "$HOME/dotfiles/config/hypr/scripts/theme_toggle.sh" dark
+        hyprctl reload
         ;;
     "Light Mode (System)")
-        gsettings set org.gnome.desktop.interface color-scheme 'prefer-light' 2>/dev/null
-        gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita' 2>/dev/null
-        sed -i 's/ColorScheme=.*/ColorScheme=BreezeLight/' ~/.config/kdeglobals 2>/dev/null
-        sed -i 's/ColorScheme=.*/ColorScheme=BreezeLight/' ~/.config/dolphinrc 2>/dev/null
-        notify-send -u low "System Theme" "Switched to Light Mode"
+        bash "$HOME/dotfiles/config/hypr/scripts/theme_toggle.sh" light
+        hyprctl reload
         ;;
 esac

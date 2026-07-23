@@ -1,0 +1,54 @@
+{
+    // macOS MacBook Typography & Spacing
+    "editor.fontFamily": "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'JetBrainsMono Nerd Font', 'Fira Code', monospace",
+    "editor.fontSize": 13.5,
+    "editor.lineHeight": 26,
+    "editor.letterSpacing": 0.3,
+    "editor.fontWeight": "500",
+    "editor.fontLigatures": true,
+    "workbench.fontAliasing": "antialiased",
+
+    // macOS Window Controls & Titlebar
+    "window.titleBarStyle": "custom",
+    "window.dialogStyle": "custom",
+    "workbench.layoutControl.enabled": false,
+    "workbench.editor.tabActionLocation": "left",
+    "workbench.activityBar.location": "top",
+
+    // Smooth macOS Inertia Scrolling & Caret Animations
+    "editor.cursorStyle": "line",
+    "editor.cursorWidth": 2,
+    "editor.cursorBlinking": "smooth",
+    "editor.cursorSmoothCaretAnimation": "on",
+    "editor.cursorSurroundingLines": 5,
+    "editor.cursorSurroundingLinesStyle": "all",
+    "editor.smoothScrolling": true,
+    "workbench.list.smoothScrolling": true,
+    "terminal.integrated.smoothScrolling": true,
+
+    // Code Folding Accordion Animation & Live Linked Editing
+    "editor.foldingAnimation": true,
+    "editor.linkedEditing": true,
+    "editor.minimap.enabled": false,
+
+    // Integrated Terminal macOS Styling
+    "terminal.integrated.fontFamily": "-apple-system, BlinkMacSystemFont, 'JetBrainsMono Nerd Font', monospace",
+    "terminal.integrated.fontSize": 13,
+    "terminal.integrated.lineHeight": 1.3,
+    "terminal.integrated.cursorBlinking": true,
+    "terminal.integrated.cursorStyle": "line",
+
+    // Tree & Indentation Guide Animations
+    "workbench.tree.renderIndentGuides": "always",
+
+    // Auto-Save Configuration
+    "files.autoSave": "afterDelay",
+    "files.autoSaveDelay": 1000,
+
+    // Code Runner Integration (Ctrl+Alt+N)
+    "code-runner.runInTerminal": true,
+    "code-runner.clearPreviousOutput": true,
+    "code-runner.saveFileBeforeRun": true,
+    "code-runner.saveAllFilesBeforeRun": true,
+    "code-runner.ignoreSelection": true
+}
