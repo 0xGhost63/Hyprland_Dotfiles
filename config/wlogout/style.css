@@ -1,21 +1,19 @@
 * {
     background-image: none;
     font-size: 20px;
-    font-family: "JetBrains Mono NFM";
+    font-family: "JetBrainsMono Nerd Font", "JetBrains Mono NFM";
 }
 
-@import '../../.config/waybar/colors.css';
-
 window {
-    background-color: rgba(17, 17, 17, 0.45)
+    background-color: rgba(10, 10, 15, 0.5);
 }
 
 button {
     border-radius: 20px;
-    margin: 10px;
-    color: @on_surface;
-    border: 1px solid @outline_variant;
-    background-color: rgba(15, 20, 22, 0.75);
+    margin: 12px;
+    color: #e0d7ff;
+    border: 2px solid #7aa2f7;
+    background-color: rgba(13, 2, 33, 0.45);
     outline: none;
     background-repeat: no-repeat;
     background-position: center 25%;
@@ -23,26 +21,22 @@ button {
     box-shadow: none;
     text-shadow: none;
     padding-top: 65px;
-}
-
-button:hover {
-    background-color: @on_secondary_fixed_variant;
-    border-color: @primary;
-    background-size: 32%;
     transition: all 0.2s ease-in-out;
 }
 
-button:focus {
-    background-color: rgba(15, 20, 22, 0.75);
-    outline: none;
+button:focus, button:hover {
+    background-color: rgba(122, 162, 247, 0.25);
+    border-color: #00e5ff;
+    color: #ffffff;
+    background-size: 32%;
     box-shadow: none;
+    outline: none;
 }
 
 /* Adjust the size of the icon or content inside the button */
 button span {
-    font-size: 1.2em; /* Increase the font size */
+    font-size: 1.2em;
 }
-
 
 #lock {
     background-image: url("/home/sannan/.config/wlogout/icons/lock.png");
@@ -67,4 +61,3 @@ button span {
 #hibernate {
     background-image: url("/home/sannan/.config/wlogout/icons/hibernate.png");
 }
-
