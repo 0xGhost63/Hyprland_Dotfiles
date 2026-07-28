@@ -52,46 +52,47 @@ window#media-island {
 }
 
 box#island-box {
-    background: rgba(14, 10, 20, 0.88);
-    border-radius: 28px;
-    border: 1px solid rgba(122, 162, 247, 0.35);
-    padding: 10px 18px 10px 14px;
+    background: rgba(10, 8, 18, 0.92);
+    border-radius: 40px;
+    border: 1px solid rgba(122, 162, 247, 0.4);
+    padding: 8px 20px 8px 12px;
+    min-height: 62px;
 }
 
 image#album-art {
-    border-radius: 12px;
+    border-radius: 10px;
 }
 
 label#title-label {
     color: #e2e2f0;
     font-family: "JetBrainsMono Nerd Font";
-    font-size: 14px;
+    font-size: 13px;
     font-weight: bold;
 }
 
 label#artist-label {
     color: #7aa2f7;
     font-family: "JetBrainsMono Nerd Font";
-    font-size: 12px;
+    font-size: 11px;
 }
 
 label#status-label {
     color: #00e5ff;
     font-family: "JetBrainsMono Nerd Font";
     font-size: 11px;
-    margin-top: 2px;
+    margin-top: 1px;
 }
 
 label#hint-label {
-    color: rgba(180, 180, 220, 0.55);
+    color: rgba(180, 180, 220, 0.5);
     font-family: "JetBrainsMono Nerd Font";
-    font-size: 10px;
+    font-size: 9px;
 }
 
 label#separator {
-    color: rgba(122, 162, 247, 0.4);
+    color: rgba(122, 162, 247, 0.35);
     font-size: 20px;
-    margin: 0px 6px;
+    margin: 0px 4px;
 }
 """
 
@@ -179,12 +180,12 @@ class MediaIsland(Gtk.Window):
         island_box.pack_start(vbox, True, True, 0)
 
         # ── Position: top-center below waybar ─────────────
-        self.set_default_size(460, 90)
+        self.set_default_size(500, 80)
         self.realize()
         monitor = screen.get_monitor_geometry(0)
-        win_w = 460
+        win_w, win_h = 500, 80
         x = monitor.x + (monitor.width - win_w) // 2
-        y = monitor.y + 40   # just below waybar
+        y = monitor.y + 38   # just below waybar (~38px tall)
         self.move(x, y)
 
         # ── Initial populate ───────────────────────────────
