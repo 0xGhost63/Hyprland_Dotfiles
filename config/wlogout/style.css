@@ -1,6 +1,6 @@
 * {
     background-image: none;
-    font-size: 18px;
+    font-size: 20px;
     font-family: "JetBrainsMono Nerd Font", "JetBrains Mono NFM";
 }
 
@@ -13,8 +13,6 @@ window {
 button {
     border-radius: 20px;
     margin: 10px;
-    min-height: 140px;
-    min-width: 150px;
     color: @inverse_surface;
     border-color: @inverse_surface;
     background-color: rgba(0, 0, 0, 0.5);
@@ -22,8 +20,8 @@ button {
     border-style: solid;
     border-width: 0px;
     background-repeat: no-repeat;
-    background-position: center 28%;
-    background-size: 35%;
+    background-position: center 30%;
+    background-size: 25%;
     box-shadow: none;
     text-shadow: none;
     padding-top: 80px;
@@ -33,36 +31,36 @@ button {
 /* Only keyboard focus triggers highlight — hover does NOT */
 button:focus {
     background-color: @on_secondary_fixed_variant;
-    background-size: 38%;
+    background-size: 28%;
     animation: gradient_f 20s ease-in infinite;
     transition: all 0.3s cubic-bezier(.55, 0.0, .28, 1.682);
     border-color: @on_secondary_fixed_variant;
 }
 
 button span {
-    font-size: 1.1em;
+    font-size: 1.2em;
 }
 
 #lock {
-    background-image: image(url("/usr/share/icons/Papirus-Dark/24x24/actions/system-lock-screen.svg"));
+    background-image: image(url("./icons/lock.png"));
 }
 
 #logout {
-    background-image: image(url("/usr/share/icons/Papirus-Dark/24x24/actions/system-log-out.svg"));
+    background-image: image(url("./icons/logout.png"));
 }
 
 #suspend {
-    background-image: image(url("/usr/share/icons/Papirus-Dark/24x24/actions/system-suspend.svg"));
+    background-image: image(url("./icons/sleep.png"));
 }
 
 #shutdown {
-    background-image: image(url("/usr/share/icons/Papirus-Dark/24x24/actions/system-shutdown.svg"));
+    background-image: image(url("./icons/power.png"));
 }
 
 #reboot {
-    background-image: image(url("/usr/share/icons/Papirus-Dark/24x24/actions/system-reboot.svg"));
+    background-image: image(url("./icons/restart.png"));
 }
 
 #hibernate {
-    background-image: image(url("/usr/share/icons/Papirus-Dark/24x24/actions/system-suspend-hibernate.svg"));
+    background-image: image(url("./icons/hibernate.png"));
 }
