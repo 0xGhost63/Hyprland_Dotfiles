@@ -1,7 +1,10 @@
 #!/bin/bash
-# Toggle Spaced wlogout Power Menu
+# Toggle wlogout Power Menu (Super + Esc)
 if pgrep -x "wlogout" > /dev/null; then
     pkill -x "wlogout"
 else
-    wlogout -b 3 -c 30 -r 30 -L 150 -R 150 -T 120 -B 120 --protocol layer-shell
+    wlogout \
+        --layout ~/.config/wlogout/layout \
+        --css ~/.config/wlogout/style.css \
+        --protocol layer-shell
 fi
