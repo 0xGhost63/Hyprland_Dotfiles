@@ -8,9 +8,11 @@ Auto-dismisses after 6 seconds of inactivity.
 
 import gi
 gi.require_version("Gtk", "3.0")
+gi.require_version("Gdk", "3.0")
 gi.require_version("GdkPixbuf", "2.0")
 from gi.repository import Gtk, Gdk, GLib, GdkPixbuf, Pango
 
+import cairo
 import subprocess
 import sys
 import os
@@ -46,55 +48,91 @@ def playerctl(*args):
     return run(["playerctl"] + list(args))
 
 
-CSS = b"""
-window#media-island {
+def load_matugen_colors():
+    colors = {
+        "bg": "rgba(25, 17, 18, 0.95)",
+        "border": "rgba(255, 178, 191, 0.5)",
+        "primary": "#ffb2bf",
+        "text": "#f0dee0",
+        "subtext": "rgba(240, 222, 224, 0.65)"
+    }
+    css_path = os.path.expanduser("~/.config/waybar/colors.css")
+    if os.path.exists(css_path):
+        try:
+            with open(css_path, "r") as f:
+                for line in f:
+                    line = line.strip()
+                    if "@define-color primary " in line:
+                        colors["primary"] = line.split("primary")[1].strip(" ;")
+                    elif "@define-color surface_container " in line:
+                        hex_bg = line.split("surface_container")[1].strip(" ;")
+                        h = hex_bg.lstrip("#")
+                        r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16) if len(h) >= 6 else (0,0,0)
+                        colors["bg"] = f"rgba({r}, {g}, {b}, 0.94)"
+                    elif "@define-color on_surface " in line:
+                        colors["text"] = line.split("on_surface")[1].strip(" ;")
+                    elif "@define-color primary_container " in line:
+                        hex_out = line.split("primary_container")[1].strip(" ;")
+                        h = hex_out.lstrip("#")
+                        r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16) if len(h) >= 6 else (0,0,0)
+                        colors["border"] = f"rgba({r}, {g}, {b}, 0.5)"
+        except Exception:
+            pass
+    return colors
+
+
+mat_colors = load_matugen_colors()
+
+CSS = f"""
+window#media-island {{
+    background-color: transparent;
     background: transparent;
-}
+}}
 
-box#island-box {
-    background: rgba(10, 8, 18, 0.92);
+box#island-box {{
+    background-color: {mat_colors['bg']};
     border-radius: 40px;
-    border: 1px solid rgba(122, 162, 247, 0.4);
-    padding: 8px 20px 8px 12px;
-    min-height: 62px;
-}
+    border: 1.5px solid {mat_colors['border']};
+    padding: 10px 22px 10px 14px;
+    min-height: 78px;
+}}
 
-image#album-art {
-    border-radius: 10px;
-}
+image#album-art {{
+    border-radius: 12px;
+}}
 
-label#title-label {
-    color: #e2e2f0;
+label#title-label {{
+    color: {mat_colors['text']};
     font-family: "JetBrainsMono Nerd Font";
-    font-size: 13px;
+    font-size: 14px;
     font-weight: bold;
-}
+}}
 
-label#artist-label {
-    color: #7aa2f7;
+label#artist-label {{
+    color: {mat_colors['primary']};
     font-family: "JetBrainsMono Nerd Font";
-    font-size: 11px;
-}
+    font-size: 12px;
+}}
 
-label#status-label {
-    color: #00e5ff;
+label#status-label {{
+    color: {mat_colors['primary']};
     font-family: "JetBrainsMono Nerd Font";
-    font-size: 11px;
+    font-size: 12px;
     margin-top: 1px;
-}
+}}
 
-label#hint-label {
-    color: rgba(180, 180, 220, 0.5);
+label#hint-label {{
+    color: {mat_colors['subtext']};
     font-family: "JetBrainsMono Nerd Font";
     font-size: 9px;
-}
+}}
 
-label#separator {
-    color: rgba(122, 162, 247, 0.35);
-    font-size: 20px;
-    margin: 0px 4px;
-}
-"""
+label#separator {{
+    color: {mat_colors['border']};
+    font-size: 24px;
+    margin: 0px 6px;
+}}
+""".encode("utf-8")
 
 
 class MediaIsland(Gtk.Window):
@@ -111,11 +149,13 @@ class MediaIsland(Gtk.Window):
         self.set_app_paintable(True)
         self.set_name("media-island")
 
-        # Transparent background
+        # 100% Transparent background setup with Cairo
         screen = self.get_screen()
         visual = screen.get_rgba_visual()
-        if visual:
+        if visual and screen.is_composited():
             self.set_visual(visual)
+
+        self.connect("draw", self.on_draw)
 
         # ── CSS styling ────────────────────────────────────
         provider = Gtk.CssProvider()
@@ -124,22 +164,15 @@ class MediaIsland(Gtk.Window):
             screen, provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
 
-        # ── Main outer box ─────────────────────────────────
-        outer = Gtk.Box()
-        outer.set_margin_top(6)
-        outer.set_margin_bottom(6)
-        outer.set_margin_start(6)
-        outer.set_margin_end(6)
-
-        island_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
+        # ── Main container (no outer margins) ──────────────
+        island_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=14)
         island_box.set_name("island-box")
-        outer.pack_start(island_box, True, True, 0)
-        self.add(outer)
+        self.add(island_box)
 
-        # ── Album art ─────────────────────────────────────
+        # ── Album art (Larger: 76x76) ──────────────────────
         self.art_image = Gtk.Image()
         self.art_image.set_name("album-art")
-        self.art_image.set_size_request(56, 56)
+        self.art_image.set_size_request(76, 76)
         self.art_image.set_valign(Gtk.Align.CENTER)
         island_box.pack_start(self.art_image, False, False, 0)
 
@@ -150,21 +183,21 @@ class MediaIsland(Gtk.Window):
         island_box.pack_start(sep, False, False, 0)
 
         # ── Text section ──────────────────────────────────
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=1)
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
         vbox.set_valign(Gtk.Align.CENTER)
 
         self.title_label = Gtk.Label()
         self.title_label.set_name("title-label")
         self.title_label.set_halign(Gtk.Align.START)
         self.title_label.set_ellipsize(Pango.EllipsizeMode.END)
-        self.title_label.set_max_width_chars(28)
+        self.title_label.set_max_width_chars(30)
         vbox.pack_start(self.title_label, False, False, 0)
 
         self.artist_label = Gtk.Label()
         self.artist_label.set_name("artist-label")
         self.artist_label.set_halign(Gtk.Align.START)
         self.artist_label.set_ellipsize(Pango.EllipsizeMode.END)
-        self.artist_label.set_max_width_chars(26)
+        self.artist_label.set_max_width_chars(28)
         vbox.pack_start(self.artist_label, False, False, 0)
 
         self.status_label = Gtk.Label()
@@ -179,13 +212,13 @@ class MediaIsland(Gtk.Window):
 
         island_box.pack_start(vbox, True, True, 0)
 
-        # ── Position: top-center below waybar ─────────────
-        self.set_default_size(500, 80)
+        # ── Position: top-center directly below topbar ──────
+        win_w, win_h = 510, 88
+        self.set_default_size(win_w, win_h)
         self.realize()
         monitor = screen.get_monitor_geometry(0)
-        win_w, win_h = 500, 80
         x = monitor.x + (monitor.width - win_w) // 2
-        y = monitor.y + 38   # just below waybar (~38px tall)
+        y = monitor.y + 38   # 38px from top (just below Waybar)
         self.move(x, y)
 
         # ── Initial populate ───────────────────────────────
@@ -199,14 +232,21 @@ class MediaIsland(Gtk.Window):
 
         self.show_all()
 
+    def on_draw(self, widget, cr):
+        cr.set_operator(cairo.OPERATOR_SOURCE)
+        cr.set_source_rgba(0, 0, 0, 0)
+        cr.paint()
+        cr.set_operator(cairo.OPERATOR_OVER)
+        return False
+
     def reset_timer(self):
         if self._dismiss_id:
             GLib.source_remove(self._dismiss_id)
         self._dismiss_id = GLib.timeout_add_seconds(6, self.dismiss)
 
     def update_info(self):
-        title  = playerctl("metadata", "title")  or "No media"
-        artist = playerctl("metadata", "artist") or ""
+        title  = playerctl("metadata", "title")  or "No media playing"
+        artist = playerctl("metadata", "artist") or "Media Player"
         status = playerctl("status")             or "Stopped"
 
         self.title_label.set_text(title)
@@ -227,13 +267,13 @@ class MediaIsland(Gtk.Window):
         try:
             if url.startswith("file://"):
                 path = url[7:]
-                pb = GdkPixbuf.Pixbuf.new_from_file_at_scale(path, 56, 56, True)
+                pb = GdkPixbuf.Pixbuf.new_from_file_at_scale(path, 76, 76, True)
                 self.art_image.set_from_pixbuf(pb)
                 return
             elif url.startswith("http"):
                 tmp = tempfile.NamedTemporaryFile(suffix=".jpg", delete=False)
                 urllib.request.urlretrieve(url, tmp.name)
-                pb = GdkPixbuf.Pixbuf.new_from_file_at_scale(tmp.name, 56, 56, True)
+                pb = GdkPixbuf.Pixbuf.new_from_file_at_scale(tmp.name, 76, 76, True)
                 self.art_image.set_from_pixbuf(pb)
                 return
         except Exception:

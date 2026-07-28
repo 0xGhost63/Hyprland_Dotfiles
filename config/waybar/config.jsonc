@@ -129,14 +129,9 @@
             }
         },
         "mpris": {
-            "format": "{player_icon} {dynamic}",
-            "format-paused": "{status_icon} {dynamic}",
-            "max-length": 25,
-            "dynamic-len": 25,
-            "dynamic-importance-order": [
-                "title",
-                "artist"
-            ],
+            "format": "{player_icon} {title}",
+            "format-paused": "{status_icon} {title}",
+            "max-length": 55,
             "player-icons": {
                 "spotify": "󰓇",
                 "default": "▶"
