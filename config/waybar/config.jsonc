@@ -247,7 +247,7 @@
         "image#albumart": {
             "path": "/tmp/waybar-art.png",
             "size": 28,
-            "interval": 2,
+            "interval": 1,
             "tooltip": false,
             "on-click": "playerctl play-pause"
         },

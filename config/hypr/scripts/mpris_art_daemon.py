@@ -11,6 +11,7 @@ import urllib.request
 import urllib.parse
 
 OUT_FILE = "/tmp/waybar-art.png"
+TMP_FILE = "/tmp/waybar-art.png.tmp"
 CACHE_DIR = "/tmp/waybar_art_cache"
 os.makedirs(CACHE_DIR, exist_ok=True)
 
@@ -77,26 +78,28 @@ def get_active_media_info():
                 page_url = parts[3].strip() if len(parts) > 3 else ""
                 title = parts[4].strip() if len(parts) > 4 else ""
 
+                track_key = f"{player}:{title}:{art_url}:{page_url}"
+
                 # 1. Direct artUrl (Spotify, local files, web thumbnails)
                 if art_url:
                     if art_url.startswith("file://"):
                         local_path = art_url.replace("file://", "")
                         if os.path.exists(local_path):
-                            return (f"{player}:{title}", "local", local_path)
+                            return (track_key, "local", local_path)
                     elif art_url.startswith("http://") or art_url.startswith("https://"):
-                        return (f"{player}:{art_url}", "remote", art_url)
+                        return (track_key, "remote", art_url)
 
                 # 2. YouTube Video ID in page_url or art_url
                 vid = extract_youtube_id(page_url) or extract_youtube_id(art_url)
                 if vid:
                     yt_url = f"https://img.youtube.com/vi/{vid}/hqdefault.jpg"
-                    return (f"{player}:{vid}", "remote", yt_url)
+                    return (track_key, "remote", yt_url)
 
                 # 3. YouTube search fallback by title (for Brave / Chrome when url/artUrl is empty)
                 if "youtube" in title.lower() or "remix" in title.lower() or "(" in title or title:
                     thumb_file = fetch_youtube_thumb_by_title(title)
                     if thumb_file:
-                        return (f"{player}:{title}", "local", thumb_file)
+                        return (track_key, "local", thumb_file)
 
     except Exception:
         pass
@@ -124,9 +127,11 @@ def update_art():
             LAST_KEY = key
             try:
                 if kind == "remote":
-                    urllib.request.urlretrieve(url_or_path, OUT_FILE)
+                    urllib.request.urlretrieve(url_or_path, TMP_FILE)
+                    os.replace(TMP_FILE, OUT_FILE)
                 elif kind == "local":
-                    subprocess.run(["cp", url_or_path, OUT_FILE], stderr=subprocess.DEVNULL)
+                    subprocess.run(["cp", url_or_path, TMP_FILE], stderr=subprocess.DEVNULL)
+                    os.replace(TMP_FILE, OUT_FILE)
             except Exception:
                 pass
     else:
@@ -140,4 +145,4 @@ def update_art():
 if __name__ == "__main__":
     while True:
         update_art()
-        time.sleep(1)
+        time.sleep(0.5)
