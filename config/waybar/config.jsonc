@@ -82,7 +82,7 @@
             "format-linked": "󰖩 No Internet",
             "format-disabled": "󰖪 Disabled",
             "tooltip-format": "{ifname}: {ipaddr}/{cidr}\n{essid} ({signalStrength}%)\n↑ {bandwidthUpBits}  ↓ {bandwidthDownBits}",
-            "on-click": "~/.config/hypr/scripts/rofi_wifi.sh",
+            "on-click": "~/.config/hypr/scripts/wifi_manager.sh",
             "interval": 5
         },
         "bluetooth": {
