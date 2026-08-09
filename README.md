@@ -1,3 +1,4 @@
+
 # Hyprland Desktop Configuration
 
 Welcome to my personal Hyprland setup. This repository contains the complete configuration files, scripts, assets, and themes I use to build a clean, unified, and highly responsive Linux desktop environment. 
