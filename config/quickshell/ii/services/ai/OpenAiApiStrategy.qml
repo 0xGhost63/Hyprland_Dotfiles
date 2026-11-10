@@ -21,14 +21,20 @@ ApiStrategy {
                 }),
             ],
             "stream": true,
-            "tools": tools,
             "temperature": temperature,
         };
-        return model.extraParams ? Object.assign({}, baseData, model.extraParams) : baseData;
+        if (tools && tools.length > 0) {
+            baseData["tools"] = tools;
+        }
+        let result = model.extraParams ? Object.assign({}, baseData, model.extraParams) : baseData;
+        if (Array.isArray(result.models) && result.models.length > 3) {
+            result.models = result.models.slice(0, 3);
+        }
+        return result;
     }
 
     function buildAuthorizationHeader(apiKeyEnvVarName: string): string {
-        return `-H "Authorization: Bearer \$\{${apiKeyEnvVarName}\}"`;
+        return `-H "Authorization: Bearer \$\{${apiKeyEnvVarName}\}" -H "HTTP-Referer: https://github.com/end-4/dots-hyprland" -H "X-Title: QuickShell"`;
     }
 
     function parseResponseLine(line, message) {

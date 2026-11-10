@@ -255,6 +255,26 @@ Singleton {
     // - api_format: The API format of the model. Can be "openai" or "gemini". Default is "openai".
     // - extraParams: Extra parameters to be passed to the model. This is a JSON object.
     property var models: Config.options.policies.ai === 2 ? {} : {
+        "openrouter-free": aiModelComponent.createObject(this, {
+            "name": "OpenRouter Free (Auto + Fallbacks)",
+            "icon": "openrouter-symbolic",
+            "description": Translation.tr("Online | OpenRouter Free Meta-Router\nAutomatically routes across and falls back to free models (LLaMA 3.3 70B, Gemma 3, DeepSeek R1, Qwen, Mistral) with zero downtime."),
+            "homepage": "https://openrouter.ai/models?max_price=0",
+            "endpoint": "https://openrouter.ai/api/v1/chat/completions",
+            "model": "openrouter/free",
+            "requires_key": true,
+            "key_id": "openrouter",
+            "key_get_link": "https://openrouter.ai/settings/keys",
+            "key_get_description": Translation.tr("**Pricing**: free. Zero-cost tier with automated fallback across providers.\n\n**Instructions**: Sign up at https://openrouter.ai, go to Keys, generate a key, and set it via `/key YOUR_KEY`."),
+            "api_format": "openai",
+            "extraParams": {
+                "models": [
+                    "openrouter/free",
+                    "meta-llama/llama-3.3-70b-instruct:free",
+                    "google/gemma-3-27b-it:free"
+                ]
+            }
+        }),
         "gemini-2.5-flash": aiModelComponent.createObject(this, {
             "name": "Gemini 2.5 Flash",
             "icon": "google-gemini-symbolic",
@@ -713,6 +733,15 @@ Singleton {
             // Handle error responses
             if (requester.message.content.includes("API key not valid")) {
                 root.addApiKeyAdvice(models[requester.message.model]);
+            } else if (requester.message.content.includes("RESOURCE_EXHAUSTED") || requester.message.content.includes("Quota exceeded") || requester.message.content.includes("quota") || requester.message.content.includes("429")) {
+                const openrouterKey = root.apiKeys["openrouter"];
+                if (openrouterKey && openrouterKey.length > 0 && requester.message.model !== "openrouter-free") {
+                    root.addMessage(Translation.tr("⚠️ **%1 token quota exceeded.**\n\n🔄 Automatically falling back to **OpenRouter Free (Auto + Fallbacks)**...").arg(models[requester.message.model]?.name ?? requester.message.model), root.interfaceRole);
+                    root.setModel("openrouter-free", true, false);
+                    requester.makeRequest();
+                } else {
+                    root.addMessage(Translation.tr("⚠️ **Rate limit or token quota exceeded on %1.**\n\n💡 **Tip**: Switch to OpenRouter Free (with auto fallbacks across LLaMA, DeepSeek, Gemma, Qwen) by typing:\n```\n/model openrouter-free\n```\nGet a free key at https://openrouter.ai/settings/keys and set it with `/key YOUR_KEY`.").arg(models[requester.message.model]?.name ?? requester.message.model), root.interfaceRole);
+                }
             }
         }
     }

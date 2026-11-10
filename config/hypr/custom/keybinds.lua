@@ -36,8 +36,6 @@ hl.bind("SUPER + SHIFT + F", hl.dsp.window.fullscreen({ mode = "fullscreen", act
 -- Yazi File Manager (Super+Shift+E)
 hl.bind("SUPER + SHIFT + E", hl.dsp.exec_cmd("kitty yazi"), {description = "App: Yazi File Manager"})
 
--- Lock In Mode (Super+Shift+G)
-hl.bind("SUPER + SHIFT + G", hl.dsp.exec_cmd("~/.config/hypr/scripts/lockin_mode.sh"), {description = "Utilities: Lock In Mode"})
 
 -- Screen Shaders Menu (Super+Shift+H) -- moved from Super+Shift+N to avoid the right-sidebar binding
 hl.bind("SUPER + SHIFT + H", hl.dsp.exec_cmd("~/.config/hypr/scripts/hyprshade_menu.sh"), {description = "Screen: Shaders Menu"})

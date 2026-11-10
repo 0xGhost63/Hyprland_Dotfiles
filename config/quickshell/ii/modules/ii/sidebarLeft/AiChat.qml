@@ -28,14 +28,20 @@ Item {
 
     Keys.onPressed: event => {
         messageInputField.forceActiveFocus();
-        if (event.modifiers === Qt.NoModifier) {
-            if (event.key === Qt.Key_PageUp) {
-                messageListView.contentY = Math.max(0, messageListView.contentY - messageListView.height / 2);
-                event.accepted = true;
-            } else if (event.key === Qt.Key_PageDown) {
-                messageListView.contentY = Math.min(messageListView.contentHeight - messageListView.height / 2, messageListView.contentY + messageListView.height / 2);
-                event.accepted = true;
-            }
+        if (event.key === Qt.Key_PageUp) {
+            messageListView.contentY = Math.max(0, messageListView.contentY - messageListView.height * 0.7);
+            event.accepted = true;
+        } else if (event.key === Qt.Key_PageDown) {
+            const maxY = Math.max(0, messageListView.contentHeight - messageListView.height);
+            messageListView.contentY = Math.min(maxY, messageListView.contentY + messageListView.height * 0.7);
+            event.accepted = true;
+        } else if (event.key === Qt.Key_Up) {
+            messageListView.contentY = Math.max(0, messageListView.contentY - 80);
+            event.accepted = true;
+        } else if (event.key === Qt.Key_Down) {
+            const maxY = Math.max(0, messageListView.contentHeight - messageListView.height);
+            messageListView.contentY = Math.min(maxY, messageListView.contentY + 80);
+            event.accepted = true;
         }
         if ((event.modifiers & Qt.ControlModifier) && (event.modifiers & Qt.ShiftModifier) && event.key === Qt.Key_O) {
             Ai.clearMessages();
@@ -352,6 +358,18 @@ Inline w/ backslash and round brackets \\(e^{i\\pi} + 1 = 0\\)
                 vertical: true
             }
 
+            WheelHandler {
+                target: null
+                acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
+                onWheel: (event) => {
+                    const delta = event.angleDelta.y;
+                    const step = Math.abs(delta) >= 120 ? 100 : 50;
+                    const sign = delta > 0 ? -1 : 1;
+                    const maxY = Math.max(0, messageListView.contentHeight - messageListView.height + messageListView.topMargin + messageListView.bottomMargin);
+                    messageListView.contentY = Math.max(0, Math.min(messageListView.contentY + sign * step, maxY));
+                }
+            }
+
             StyledListView { // Message list
                 id: messageListView
                 z: 0
@@ -640,11 +658,29 @@ Inline w/ backslash and round brackets \\(e^{i\\pi} + 1 = 0\\)
                             if (event.key === Qt.Key_Tab) {
                                 suggestions.acceptSelectedWord();
                                 event.accepted = true;
-                            } else if (event.key === Qt.Key_Up && suggestions.visible) {
-                                suggestions.selectedIndex = Math.max(0, suggestions.selectedIndex - 1);
+                            } else if (event.key === Qt.Key_Up) {
+                                if (suggestions.visible) {
+                                    suggestions.selectedIndex = Math.max(0, suggestions.selectedIndex - 1);
+                                    event.accepted = true;
+                                } else if ((event.modifiers & Qt.ShiftModifier) || (event.modifiers & Qt.ControlModifier) || cursorPosition === 0) {
+                                    messageListView.contentY = Math.max(0, messageListView.contentY - 80);
+                                    event.accepted = true;
+                                }
+                            } else if (event.key === Qt.Key_Down) {
+                                if (suggestions.visible) {
+                                    suggestions.selectedIndex = Math.min(root.suggestionList.length - 1, suggestions.selectedIndex + 1);
+                                    event.accepted = true;
+                                } else if ((event.modifiers & Qt.ShiftModifier) || (event.modifiers & Qt.ControlModifier) || cursorPosition === text.length) {
+                                    const maxY = Math.max(0, messageListView.contentHeight - messageListView.height);
+                                    messageListView.contentY = Math.min(maxY, messageListView.contentY + 80);
+                                    event.accepted = true;
+                                }
+                            } else if (event.key === Qt.Key_PageUp) {
+                                messageListView.contentY = Math.max(0, messageListView.contentY - messageListView.height * 0.7);
                                 event.accepted = true;
-                            } else if (event.key === Qt.Key_Down && suggestions.visible) {
-                                suggestions.selectedIndex = Math.min(root.suggestionList.length - 1, suggestions.selectedIndex + 1);
+                            } else if (event.key === Qt.Key_PageDown) {
+                                const maxY = Math.max(0, messageListView.contentHeight - messageListView.height);
+                                messageListView.contentY = Math.min(maxY, messageListView.contentY + messageListView.height * 0.7);
                                 event.accepted = true;
                             } else if ((event.key === Qt.Key_Enter || event.key === Qt.Key_Return)) {
                                 if (event.modifiers & Qt.ShiftModifier) {
