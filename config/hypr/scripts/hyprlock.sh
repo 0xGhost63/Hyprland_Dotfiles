@@ -1,2 +1,2 @@
 #!/bin/bash
-hyprlock
+qs -c ii ipc call lock activate || pidof hyprlock || hyprlock
